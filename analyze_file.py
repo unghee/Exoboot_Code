@@ -11,59 +11,74 @@ import filters
 from collections import deque
 
 folder = 'exo_data/'
-filename = "20220211_1459_cmaes_LEFT.csv"
+filename = "20220303_1149_comment_update_func_LEFT.csv"
+filename2 = "20220303_1152_everything_LEFT.csv"
 
-df = pd.read_csv(folder + '/' + filename, usecols=np.arange(23))
+df = pd.read_csv(folder + '/' + filename, usecols=np.arange(22))
+df2 = pd.read_csv(folder + '/' + filename2, usecols=np.arange(22))
 
-plt.figure(1)
+maxs_frequency =1/np.diff(df.loop_time)
+our_frequency = 1/np.diff(df2.loop_time)
 
-plt.plot(df.loop_time, df.ankle_angle, 'g-', label='ankle-angle')
-plt.plot(df.loop_time, 5*df.did_heel_strike, 'r-',label='heel_strike')
-plt.plot(df.loop_time, df.gait_phase, 'k-', label='gait_phase')
-plt.plot(df.loop_time, 3*df.did_toe_off, 'b-', label = 'toe_off')
-plt.plot(df.loop_time, df.commanded_torque, 'm-', label = 'commanded torque')
-plt.plot(df.loop_time, -df.commanded_position/1000, 'y-',label='commanded position' )
-
+print('maxs freq',np.mean(maxs_frequency))
+print('our freq', np.mean(our_frequency))
+#frequency 
+plt.figure(0)
+plt.plot(maxs_frequency, label = 'no update func')
+plt.plot(our_frequency, label = 'w/ update func')
 plt.legend()
-
-plt.figure(2)
-# plt.plot(df.loop_time, 0.001*df.motor_current, 'm.-',label='motor_current')
-plt.plot(df.loop_time, df.ankle_angle, 'g-', label='ankle-angle')
-plt.plot(df.loop_time, 5*df.did_heel_strike, 'r-',label='heel_strike')
-plt.plot(df.loop_time, df.accel_z,'b-', label='acc z')
-plt.plot(df.loop_time, df.gyro_z/100, label='gyro z')
-plt.legend()
-
-plt.figure(3)
-myfilt = filters.Butterworth(N=2, Wn=3, fs = 175)
-heelstrike = []
-gyro_history = deque([0, 0, 0], maxlen=3)
-filtered_gyro = []
-
-# check heel strike logic is correct
-for gyro_z in df.gyro_z:
-    # fitered = -myfilt.filter(gyro_z) # the sign from Max's device was different from ours (neurobionics)
-    fitered = myfilt.filter(gyro_z)
-        
-    filtered_gyro.append(fitered)
-    gyro_history.appendleft(fitered)
-
-    if (gyro_history[1] > 100 and
-            gyro_history[1] > gyro_history[0] and
-                gyro_history[1] > gyro_history[2]):
-                heelstrike.append(1)
-                # flag = False
-    else:
-        heelstrike.append(0)
-    
-plt.plot(df.loop_time, np.array(heelstrike)*6,'g-', label='calculated heelstrike')
-plt.plot(df.loop_time, 5*df.did_heel_strike, 'r-',label='heel_strike')
-# plt.plot(df.loop_time, df.gyro_z/100, label='gyro z')
-plt.plot(df.loop_time, df.accel_z,'b-', label='acc z')
-plt.plot(df.loop_time, np.array(filtered_gyro)/100, label='filtered gyro z')
-plt.legend()
-
 plt.show()
+
+
+# plt.figure(1)
+
+# plt.plot(df.loop_time, df.ankle_angle, 'g-', label='ankle-angle')
+# plt.plot(df.loop_time, 5*df.did_heel_strike, 'r-',label='heel_strike')
+# plt.plot(df.loop_time, df.gait_phase, 'k-', label='gait_phase')
+# plt.plot(df.loop_time, 3*df.did_toe_off, 'b-', label = 'toe_off')
+# plt.plot(df.loop_time, df.commanded_torque, 'm-', label = 'commanded torque')
+# plt.plot(df.loop_time, -df.commanded_position/1000, 'y-',label='commanded position' )
+
+# plt.legend()
+
+# plt.figure(2)
+# # plt.plot(df.loop_time, 0.001*df.motor_current, 'm.-',label='motor_current')
+# plt.plot(df.loop_time, df.ankle_angle, 'g-', label='ankle-angle')
+# plt.plot(df.loop_time, 5*df.did_heel_strike, 'r-',label='heel_strike')
+# plt.plot(df.loop_time, df.accel_z,'b-', label='acc z')
+# plt.plot(df.loop_time, df.gyro_z/100, label='gyro z')
+# plt.legend()
+
+# plt.figure(3)
+# myfilt = filters.Butterworth(N=2, Wn=3, fs = 175)
+# heelstrike = []
+# gyro_history = deque([0, 0, 0], maxlen=3)
+# filtered_gyro = []
+
+# # check heel strike logic is correct
+# for gyro_z in df.gyro_z:
+#     # fitered = -myfilt.filter(gyro_z) # the sign from Max's device was different from ours (neurobionics)
+#     fitered = myfilt.filter(gyro_z)
+        
+#     filtered_gyro.append(fitered)
+#     gyro_history.appendleft(fitered)
+
+#     if (gyro_history[1] > 100 and
+#             gyro_history[1] > gyro_history[0] and
+#                 gyro_history[1] > gyro_history[2]):
+#                 heelstrike.append(1)
+#                 # flag = False
+#     else:
+#         heelstrike.append(0)
+    
+# plt.plot(df.loop_time, np.array(heelstrike)*6,'g-', label='calculated heelstrike')
+# plt.plot(df.loop_time, 5*df.did_heel_strike, 'r-',label='heel_strike')
+# # plt.plot(df.loop_time, df.gyro_z/100, label='gyro z')
+# plt.plot(df.loop_time, df.accel_z,'b-', label='acc z')
+# plt.plot(df.loop_time, np.array(filtered_gyro)/100, label='filtered gyro z')
+# plt.legend()
+
+# plt.show()
 
 ##################
 # # # plt.plot(df.loop_time, df.accel_y, 'k-')
