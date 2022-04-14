@@ -79,6 +79,7 @@ class Exo():
             file_ID: str. Unique string added to filename. If None, no file will be saved.
             do_read_fsrs: bool indicating whether to read FSRs.
             sync_detector: gpiozero class for sync line, created in config_util '''
+        self.ports = ['/dev/ttyACM0', '/dev/ttyACM1']
         self.dev_id = dev_id
         self.max_allowable_current = max_allowable_current
         self.file_ID = file_ID
@@ -92,6 +93,8 @@ class Exo():
             self.motor_sign = -1
             self.ankle_to_motor_angle_polynomial = constants.LEFT_ANKLE_TO_MOTOR
             self.ankle_angle_offset = constants.LEFT_ANKLE_ANGLE_OFFSET
+            self.TR_from_ankle_angle = interpolate.PchipInterpolator(
+            constants.ANKLE_PTS_LEFT, self.motor_sign*constants.TR_PTS_LEFT)
             # TODO: change manual tuning of splines to be automatic
             # self.TR_from_ankle_angle = self.motor_sign * constants.LEFT_ANKLE_TO_TR
         elif self.dev_id in constants.RIGHT_EXO_DEV_IDS:
@@ -99,6 +102,8 @@ class Exo():
             self.motor_sign = 1
             self.ankle_to_motor_angle_polynomial = constants.RIGHT_ANKLE_TO_MOTOR
             self.ankle_angle_offset = constants.RIGHT_ANKLE_ANGLE_OFFSET
+            self.TR_from_ankle_angle = interpolate.PchipInterpolator(
+            constants.ANKLE_PTS_RIGHT, self.motor_sign*constants.TR_PTS_RIGHT)
             # self.TR_from_ankle_angle = self.motor_sign * constants.RIGHT_ANKLE_TO_TR
         else:
             raise ValueError(
@@ -137,8 +142,7 @@ class Exo():
                               k_val=0,
                               b_val=0,
                               ff=constants.DEFAULT_FF)
-            self.TR_from_ankle_angle = interpolate.PchipInterpolator(
-                constants.ANKLE_PTS, self.motor_sign*constants.TR_PTS)
+            #self.TR_from_ankle_angle = interpolate.PchipInterpolator(constants.ANKLE_PTS, self.motor_sign*constants.TR_PTS)
 
     @dataclass
     class DataContainer:
@@ -191,6 +195,28 @@ class Exo():
                 self.gen_var3 = None
             if do_include_sync:
                 self.sync = True
+    
+
+    def reset(self,config: Type[config_util.ConfigurableConstants]):
+        #fxs.stop_streaming(self.dev_id)
+        self.command_controller_off()
+        time.sleep(0.05)
+        fxs.stop_streaming(self.dev_id)
+        time.sleep(10)
+        #
+ 
+        #
+        fxs.send_motor_command(
+            dev_id=self.dev_id, ctrl_mode=fxe.FX_CURRENT, value=0)
+        time.sleep(0.2)
+        """for port in self.ports:
+            
+            dev_id = fxs.open(port, constants.DEFAULT_BAUD_RATE, log_level=3)"""
+
+        print(self.dev_id)
+        fxs.start_streaming(
+                        dev_id=self.dev_id, freq=config.ACTPACK_FREQ, log_en=config.DO_DEPHY_LOG)
+
 
     def close(self):
         self.update_gains()
@@ -256,7 +282,8 @@ class Exo():
         self.data.gyro_x = -1 * actpack_data.gyrox * constants.GYRO_GAIN
         self.data.gyro_y = -1 * self.motor_sign * \
             actpack_data.gyroy * constants.GYRO_GAIN
-        self.data.gyro_z = -1 * self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN # sign may be different from Max's device
+        #Remove -1 for EB-51
+        self.data.gyro_z = self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN # sign may be different from Max's device
         '''Motor angle and current are kept in Dephy's orientation, but ankle
         angle and torque are converted to positive = plantarflexion.'''
         self.data.motor_angle = actpack_data.mot_ang
