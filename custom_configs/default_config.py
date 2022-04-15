@@ -2,12 +2,11 @@
 import config_util
 config = config_util.ConfigurableConstants()
 # config.HS_GYRO_DELAY = 0.05  # For example
-config.REEL_IN_MV = 100
-config.SWING_SLACK = 5000
-config.ACTPACK_FREQ: float = 100
-config.TARGET_FREQ: float = 100
-#config.READ_ONLY = True
-#STANCE_CONTROL_STYLE: Type[StanceCtrlStyle] = StanceCtrlStyle.StalkController
+config.REEL_IN_MV = 1500
+config.REEL_IN_TIMEOUT = 0.05  # 0.2
+config.REEL_IN_SLACK_CUTOFF = 1000
+config.SWING_SLACK = 3500  # 5000
+config.DO_INCLUDE_GEN_VARS = True
 
 ''' Here are the variables that are updatable in config, and their defaults:
 
