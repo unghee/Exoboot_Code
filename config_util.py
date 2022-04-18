@@ -9,6 +9,7 @@ import argparse
 import constants
 import os
 
+
 class Task(Enum):
     '''Used to determine gait_event_detector used and state machines used.'''
     WALKING = 0
@@ -49,7 +50,8 @@ class ConfigurableConstants():
     ONLY_LOG_IF_NEW: bool = True
 
     TASK: Type[Task] = Task.WALKING
-    STANCE_CONTROL_STYLE: Type[StanceCtrlStyle] = StanceCtrlStyle.FOURPOINTSPLINE
+    STANCE_CONTROL_STYLE: Type[
+        StanceCtrlStyle] = StanceCtrlStyle.FOURPOINTSPLINE
     MAX_ALLOWABLE_CURRENT = 20000  # mA
 
     # Gait State details
@@ -90,19 +92,22 @@ class ConfigurableConstants():
     SLIP_DETECT_DELAY: int = 0
     EXPERIMENTER_NOTES: str = 'Experimenter notes go here'
 
-    #It is always zero untill the first generation 
+    #It is always zero untill the first generation
     #When this variable is non zero it means the update function can be called
     #It basically avoids any error caused by grpc call not being received due
-    #to server not running on the optimizer side  
+    #to server not running on the optimizer side
     number_of_calls: int = 0
     generation: int = 0
     # DO NOT CHANGE THE DEFAULT VALUE
     confirmed: bool = False
     User_Ready = False
 
-    
-    
+    #Needed for the Exosekeleton (EB 45, EB 51)
+    resetting_time = 685  # the Exoboot typically stops updating after 731 seconds
+
+
 class ConfigSaver():
+
     def __init__(self, file_ID: str, config: Type[ConfigurableConstants]):
         '''file_ID is used as a custom file identifier after date.'''
         self.file_ID = file_ID
@@ -116,8 +121,8 @@ class ConfigSaver():
         else:
             os.mkdir(subfolder_name)
         self.my_file = open(filename, 'w', newline='')
-        self.writer = csv.DictWriter(
-            self.my_file, fieldnames=self.config.__dict__.keys())
+        self.writer = csv.DictWriter(self.my_file,
+                                     fieldnames=self.config.__dict__.keys())
         self.writer.writeheader()
 
     def write_data(self, loop_time):
@@ -159,8 +164,12 @@ def parse_args():
                                         description='Run Exoboot Controllers',
                                         epilog='Enjoy the program! :)')
     # Add the arguments
-    my_parser.add_argument('-c', '--config', action='store',
-                           type=str, required=False, default='default_config')
+    my_parser.add_argument('-c',
+                           '--config',
+                           action='store',
+                           type=str,
+                           required=False,
+                           default='default_config')
     # Execute the parse_args() method
     args = my_parser.parse_args()
     return args
@@ -176,8 +185,8 @@ def get_sync_detector(config: Type[ConfigurableConstants]):
     if config.DO_READ_SYNC:
         print('Creating sync detector')
         import gpiozero  # pylint: disable=import-error
-        sync_detector = gpiozero.InputDevice(
-            pin=constants.SYNC_PIN, pull_up=False)
+        sync_detector = gpiozero.InputDevice(pin=constants.SYNC_PIN,
+                                             pull_up=False)
         return sync_detector
     else:
         return None
