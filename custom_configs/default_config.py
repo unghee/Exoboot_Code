@@ -2,6 +2,7 @@
 import config_util
 config = config_util.ConfigurableConstants()
 # config.HS_GYRO_DELAY = 0.05  # For example
+config.MAX_ALLOWABLE_CURRENT = 24000  # mA
 config.REEL_IN_MV = 100
 config.SWING_SLACK = 5000
 config.ACTPACK_FREQ: float = 100
