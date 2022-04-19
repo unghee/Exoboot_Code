@@ -173,6 +173,14 @@ class Exo():
         commanded_torque: float = None
         slack: int = None
         temperature: int = None
+
+        #Varun
+        rise: float = 0.2
+        peak: float = 0.53
+        fall: float = 0.60
+        peak_torque: float = 5
+        confirmed: bool = False
+
         # Optional fields--init in __post__init__
         heel_fsr: bool = field(init=False)
         toe_fsr: bool = field(init=False)
@@ -251,7 +259,7 @@ class Exo():
         fxs.set_gains(dev_id=self.dev_id, kp=self.Kp, ki=self.Ki,
                       kd=self.Kd, k_val=self.k_val, b_val=self.b_val, ff=self.ff)
 
-    def read_data(self, loop_time=None):
+    def read_data(self, config: Type[config_util.ConfigurableConstants],loop_time=None):
         '''Read data from Dephy Actpack, store in exo.data Data Container.
 
         IMU data comes from Dephy in RHR, with positive XYZ pointing
@@ -312,7 +320,10 @@ class Exo():
             self.data.toe_fsr = self.toe_fsr_detector.value
         if self.do_include_sync:
             self.data.sync = self.sync_detector.value
-
+        self.data.rise = config.RISE_FRACTION
+        self.data.fall = config.FALL_FRACTION
+        self.data.peak = config.PEAK_FRACTION
+        self.data.peak_torque = config.PEAK_TORQUE
     def get_batt_voltage(self):
         actpack_data = fxs.read_device(self.dev_id)
         return actpack_data.batt_volt
@@ -331,7 +342,7 @@ class Exo():
             self._did_heel_strike_hold = False
             self._did_toe_off_hold = False
 
-    def write_data(self, only_write_if_new: bool = True):
+    def write_data(self, config: Type[config_util.ConfigurableConstants], only_write_if_new):
         '''Writes data file, optionally only if there is new actpack data.'''
         if self.file_ID is not None and only_write_if_new:
             # This logic is messy because is_heel_strike and is_toe_off are calculated more frequently,
@@ -511,7 +522,7 @@ class Exo():
                 self.ankle_to_motor_angle_polynomial, ankle_angle) + self.motor_offset)
         return motor_angle
 
-    def standing_calibration(self,
+    def standing_calibration(self,config: Type[config_util.ConfigurableConstants],
                              calibration_mV: int = 1300,
                              max_seconds_to_calibrate: float = 5,
                              current_threshold: float = 1500,
@@ -525,7 +536,7 @@ class Exo():
         t0 = time.time()
         while time.time()-t0 < max_seconds_to_calibrate:
             time.sleep(0.01)
-            self.read_data()
+            self.read_data(config=config)
             if abs(current_filter.filter(self.data.motor_current)) > current_threshold:
                 calibrated_ankle_angle = self.data.ankle_angle
                 break
