@@ -104,6 +104,7 @@ class ConfigurableConstants():
 
     #Needed for the Exosekeleton (EB 45, EB 51)
     resetting_time = 685  # the Exoboot typically stops updating after 731 seconds
+    controller_stop_time = 710
 
     controller_stop_time = 710
 
