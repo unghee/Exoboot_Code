@@ -106,7 +106,6 @@ class ConfigurableConstants():
     resetting_time = 685  # the Exoboot typically stops updating after 731 seconds
     controller_stop_time = 710
 
-    controller_stop_time = 710
 
 
 class ConfigSaver():

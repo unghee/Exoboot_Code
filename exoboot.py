@@ -27,12 +27,12 @@ def connect_to_exos(file_ID: str,
     '''Connect to Exos, instantiate Exo objects.'''
 
     # Load Ports and baud rate
-    if fxu.is_win():		# Need for WebAgg server to work in Python 3.8
+    if fxu.is_win():  # Need for WebAgg server to work in Python 3.8
         print('Detected win32')
         import asyncio
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        port_cfg_path = os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), "ports.yaml")
+        port_cfg_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "ports.yaml")
         ports, baud_rate = fxu.load_ports_from_file(port_cfg_path)
     elif fxu.is_pi64() or fxu.is_pi():
         ports = ['/dev/ttyACM0', '/dev/ttyACM1']
@@ -45,15 +45,18 @@ def connect_to_exos(file_ID: str,
     for port in ports:
         try:
             dev_id = fxs.open(port, baud_rate, log_level=3)
-            fxs.start_streaming(
-                dev_id=dev_id, freq=config.ACTPACK_FREQ, log_en=config.DO_DEPHY_LOG)
-            exo_list.append(Exo(dev_id=dev_id, file_ID=file_ID,
-                                target_freq=config.TARGET_FREQ,
-                                do_read_fsrs=config.DO_READ_FSRS,
-                                do_include_did_slip=config.DO_DETECT_SLIP,
-                                max_allowable_current=config.MAX_ALLOWABLE_CURRENT,
-                                do_include_gen_vars=config.DO_INCLUDE_GEN_VARS,
-                                sync_detector=sync_detector))
+            fxs.start_streaming(dev_id=dev_id,
+                                freq=config.ACTPACK_FREQ,
+                                log_en=config.DO_DEPHY_LOG)
+            exo_list.append(
+                Exo(dev_id=dev_id,
+                    file_ID=file_ID,
+                    target_freq=config.TARGET_FREQ,
+                    do_read_fsrs=config.DO_READ_FSRS,
+                    do_include_did_slip=config.DO_DETECT_SLIP,
+                    max_allowable_current=config.MAX_ALLOWABLE_CURRENT,
+                    do_include_gen_vars=config.DO_INCLUDE_GEN_VARS,
+                    sync_detector=sync_detector))
         except IOError:
             print('Unable to open exo on port: ', port,
                   ' This is okay if only one exo is connected!')
@@ -64,6 +67,7 @@ def connect_to_exos(file_ID: str,
 
 
 class Exo():
+
     def __init__(self,
                  dev_id: int,
                  max_allowable_current: int,
@@ -87,14 +91,17 @@ class Exo():
         self.do_include_sync = True if sync_detector else False
         self.sync_detector = sync_detector
         if self.dev_id is None:
-            print('Exo obj created but no exoboot connected. Some methods available')
+            print(
+                'Exo obj created but no exoboot connected. Some methods available'
+            )
         elif self.dev_id in constants.LEFT_EXO_DEV_IDS:
             self.side = constants.Side.LEFT
             self.motor_sign = -1
             self.ankle_to_motor_angle_polynomial = constants.LEFT_ANKLE_TO_MOTOR
             self.ankle_angle_offset = constants.LEFT_ANKLE_ANGLE_OFFSET
             self.TR_from_ankle_angle = interpolate.PchipInterpolator(
-            constants.ANKLE_PTS_LEFT, self.motor_sign*constants.TR_PTS_LEFT)
+                constants.ANKLE_PTS_LEFT,
+                self.motor_sign * constants.TR_PTS_LEFT)
             # TODO: change manual tuning of splines to be automatic
             # self.TR_from_ankle_angle = self.motor_sign * constants.LEFT_ANKLE_TO_TR
         elif self.dev_id in constants.RIGHT_EXO_DEV_IDS:
@@ -103,15 +110,19 @@ class Exo():
             self.ankle_to_motor_angle_polynomial = constants.RIGHT_ANKLE_TO_MOTOR
             self.ankle_angle_offset = constants.RIGHT_ANKLE_ANGLE_OFFSET
             self.TR_from_ankle_angle = interpolate.PchipInterpolator(
-            constants.ANKLE_PTS_RIGHT, self.motor_sign*constants.TR_PTS_RIGHT)
+                constants.ANKLE_PTS_RIGHT,
+                self.motor_sign * constants.TR_PTS_RIGHT)
             # self.TR_from_ankle_angle = self.motor_sign * constants.RIGHT_ANKLE_TO_TR
         else:
             raise ValueError(
-                'dev_id: ', self.dev_id, 'not found in constants.LEFT_EXO_DEV_IDS or constants.RIGHT_EXO_DEV_IDS')
+                'dev_id: ', self.dev_id,
+                'not found in constants.LEFT_EXO_DEV_IDS or constants.RIGHT_EXO_DEV_IDS'
+            )
         self.motor_offset = 0
         # ankle velocity filter is hardcoded for simplicity, but can be factored out if necessary
-        self.ankle_velocity_filter = filters.Butterworth(
-            N=2, Wn=10, fs=target_freq)
+        self.ankle_velocity_filter = filters.Butterworth(N=2,
+                                                         Wn=10,
+                                                         fs=target_freq)
         if self.do_read_fsrs:
             if fxu.is_pi() or fxu.is_pi64():
                 import gpiozero  # pylint: disable=import-error
@@ -128,9 +139,10 @@ class Exo():
             else:
                 raise Exception('Can only use FSRs with rapberry pi!')
 
-        self.data = self.DataContainer(
-            do_include_FSRs=do_read_fsrs, do_include_did_slip=do_include_did_slip,
-            do_include_gen_vars=do_include_gen_vars, do_include_sync=self.do_include_sync)
+        self.data = self.DataContainer(do_include_FSRs=do_read_fsrs,
+                                       do_include_did_slip=do_include_did_slip,
+                                       do_include_gen_vars=do_include_gen_vars,
+                                       do_include_sync=self.do_include_sync)
         self.has_calibrated = False
         self.is_clipping = False
         if self.file_ID is not None:
@@ -174,7 +186,7 @@ class Exo():
         slack: int = None
         temperature: int = None
 
-        #Varun
+        #Control Parameters
         rise: float = 0.2
         peak: float = 0.53
         fall: float = 0.60
@@ -190,7 +202,8 @@ class Exo():
         gen_var2: float = field(init=False)
         gen_var3: float = field(init=False)
 
-        def __post_init__(self, do_include_FSRs, do_include_sync, do_include_did_slip, do_include_gen_vars):
+        def __post_init__(self, do_include_FSRs, do_include_sync,
+                          do_include_did_slip, do_include_gen_vars):
             # Important! The order of these args need to match their order as InitVars above
             if do_include_FSRs:
                 self.heel_fsr = False
@@ -203,28 +216,28 @@ class Exo():
                 self.gen_var3 = None
             if do_include_sync:
                 self.sync = True
-    
 
-    def reset(self,config: Type[config_util.ConfigurableConstants]):
+    def reset(self, config: Type[config_util.ConfigurableConstants]):
         #fxs.stop_streaming(self.dev_id)
         self.command_controller_off()
         time.sleep(0.05)
         fxs.stop_streaming(self.dev_id)
         time.sleep(10)
         #
- 
+
         #
-        fxs.send_motor_command(
-            dev_id=self.dev_id, ctrl_mode=fxe.FX_CURRENT, value=0)
+        fxs.send_motor_command(dev_id=self.dev_id,
+                               ctrl_mode=fxe.FX_CURRENT,
+                               value=0)
         time.sleep(0.2)
         """for port in self.ports:
             
             dev_id = fxs.open(port, constants.DEFAULT_BAUD_RATE, log_level=3)"""
 
         print(self.dev_id)
-        fxs.start_streaming(
-                        dev_id=self.dev_id, freq=config.ACTPACK_FREQ, log_en=config.DO_DEPHY_LOG)
-
+        fxs.start_streaming(dev_id=self.dev_id,
+                            freq=config.ACTPACK_FREQ,
+                            log_en=config.DO_DEPHY_LOG)
 
     def close(self):
         self.update_gains()
@@ -242,7 +255,13 @@ class Exo():
         if self.do_include_sync:
             self.sync_detector.close()
 
-    def update_gains(self, Kp=None, Ki=None, Kd=None, k_val=None, b_val=None, ff=None):
+    def update_gains(self,
+                     Kp=None,
+                     Ki=None,
+                     Kd=None,
+                     k_val=None,
+                     b_val=None,
+                     ff=None):
         '''Optionally updates individual exo gain values, and sends to Actpack.'''
         if Kp is not None:
             self.Kp = Kp
@@ -256,10 +275,17 @@ class Exo():
             self.b_val = b_val
         if ff is not None:
             self.ff = ff
-        fxs.set_gains(dev_id=self.dev_id, kp=self.Kp, ki=self.Ki,
-                      kd=self.Kd, k_val=self.k_val, b_val=self.b_val, ff=self.ff)
+        fxs.set_gains(dev_id=self.dev_id,
+                      kp=self.Kp,
+                      ki=self.Ki,
+                      kd=self.Kd,
+                      k_val=self.k_val,
+                      b_val=self.b_val,
+                      ff=self.ff)
 
-    def read_data(self, config: Type[config_util.ConfigurableConstants],loop_time=None):
+    def read_data(self,
+                  config: Type[config_util.ConfigurableConstants],
+                  loop_time=None):
         '''Read data from Dephy Actpack, store in exo.data Data Container.
 
         IMU data comes from Dephy in RHR, with positive XYZ pointing
@@ -275,10 +301,11 @@ class Exo():
 
         # Check to see if values are reasonable
         ankle_angle_temp = (-1 * self.motor_sign * actpack_data.ank_ang *
-                            constants.ENC_CLICKS_TO_DEG + self.ankle_angle_offset)
+                            constants.ENC_CLICKS_TO_DEG +
+                            self.ankle_angle_offset)
         if ankle_angle_temp > constants.MAX_ANKLE_ANGLE or ankle_angle_temp < constants.MIN_ANKLE_ANGLE:
-            print('Bad packet caught on side: ', self.side, 'ankle_angle: ', ankle_angle_temp,
-                  'at time: ', self.data.state_time)
+            print('Bad packet caught on side: ', self.side, 'ankle_angle: ',
+                  ankle_angle_temp, 'at time: ', self.data.state_time)
             return  # Exit early
         self.data.ankle_angle = ankle_angle_temp
         self.data.state_time = actpack_data.state_time * constants.MS_TO_SECONDS
@@ -291,7 +318,7 @@ class Exo():
         self.data.gyro_y = -1 * self.motor_sign * \
             actpack_data.gyroy * constants.GYRO_GAIN
         #Remove -1 for EB-51
-        self.data.gyro_z = self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN # sign may be different from Max's device
+        self.data.gyro_z = self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN  # sign may be different from Max's device
         '''Motor angle and current are kept in Dephy's orientation, but ankle
         angle and torque are converted to positive = plantarflexion.'''
         self.data.motor_angle = actpack_data.mot_ang
@@ -303,15 +330,14 @@ class Exo():
         if self.has_calibrated:
             self.data.slack = self.get_slack()
 
-        if (self.last_state_time is None or
-            last_ankle_angle is None or
-                self.data.state_time-self.last_state_time > 20):
+        if (self.last_state_time is None or last_ankle_angle is None
+                or self.data.state_time - self.last_state_time > 20):
             self.data.ankle_velocity = 0
         elif self.data.state_time == self.last_state_time:
             pass  # Keep old velocity
         else:
-            angular_velocity = (
-                self.data.ankle_angle - last_ankle_angle)/(self.data.state_time-self.last_state_time)
+            angular_velocity = (self.data.ankle_angle - last_ankle_angle) / (
+                self.data.state_time - self.last_state_time)
             self.data.ankle_velocity = self.ankle_velocity_filter.filter(
                 angular_velocity)
 
@@ -324,6 +350,8 @@ class Exo():
         self.data.fall = config.FALL_FRACTION
         self.data.peak = config.PEAK_FRACTION
         self.data.peak_torque = config.PEAK_TORQUE
+        self.data.confirmed = config.confirmed
+
     def get_batt_voltage(self):
         actpack_data = fxs.read_device(self.dev_id)
         return actpack_data.batt_volt
@@ -336,13 +364,14 @@ class Exo():
                 time.strftime("%Y%m%d_%H%M_") + file_ID + \
                 '_' + self.side.name + '.csv'
             self.my_file = open(self.filename, 'w', newline='')
-            self.writer = csv.DictWriter(
-                self.my_file, fieldnames=self.data.__dict__.keys())
+            self.writer = csv.DictWriter(self.my_file,
+                                         fieldnames=self.data.__dict__.keys())
             self.writer.writeheader()
             self._did_heel_strike_hold = False
             self._did_toe_off_hold = False
 
-    def write_data(self, config: Type[config_util.ConfigurableConstants], only_write_if_new):
+    def write_data(self, config: Type[config_util.ConfigurableConstants],
+                   only_write_if_new):
         '''Writes data file, optionally only if there is new actpack data.'''
         if self.file_ID is not None and only_write_if_new:
             # This logic is messy because is_heel_strike and is_toe_off are calculated more frequently,
@@ -377,8 +406,9 @@ class Exo():
             self.command_controller_off()
             raise ValueError(
                 'abs(desired_mA) must be < config.max_allowable_current')
-        fxs.send_motor_command(
-            dev_id=self.dev_id, ctrl_mode=fxe.FX_CURRENT, value=desired_mA)
+        fxs.send_motor_command(dev_id=self.dev_id,
+                               ctrl_mode=fxe.FX_CURRENT,
+                               value=desired_mA)
         self.data.commanded_current = desired_mA
         self.data.commanded_position = None
 
@@ -386,17 +416,20 @@ class Exo():
         '''Commands voltage (mV), with positive = PF on right, DF on left.'''
         if abs(desired_mV) > constants.MAX_ALLOWABLE_VOLTAGE_COMMAND:
             raise ValueError(
-                'abs(desired_mV) must be < constants.MAX_ALLOWABLE_VOLTAGE_COMMAND')
-        fxs.send_motor_command(
-            dev_id=self.dev_id, ctrl_mode=fxe.FX_VOLTAGE, value=desired_mV)
+                'abs(desired_mV) must be < constants.MAX_ALLOWABLE_VOLTAGE_COMMAND'
+            )
+        fxs.send_motor_command(dev_id=self.dev_id,
+                               ctrl_mode=fxe.FX_VOLTAGE,
+                               value=desired_mV)
         self.data.commanded_current = None
         self.data.commanded_position = None
         self.data.commanded_torque = None
 
     def command_motor_angle(self, desired_motor_angle: int):
         '''Commands motor angle (counts). Pay attention to the sign!'''
-        fxs.send_motor_command(
-            dev_id=self.dev_id, ctrl_mode=fxe.FX_POSITION, value=desired_motor_angle)
+        fxs.send_motor_command(dev_id=self.dev_id,
+                               ctrl_mode=fxe.FX_POSITION,
+                               value=desired_motor_angle)
         self.data.commanded_current = None
         self.data.commanded_position = desired_motor_angle
         self.data.commanded_torque = None
@@ -406,20 +439,26 @@ class Exo():
         # k_val and b_val are modified by updating gains (weird, yes)
         if k_val > constants.MAX_ALLOWABLE_K_COMMAND or k_val < 0:
             raise ValueError(
-                'k_val must be positive, and less than max. tested k_val in constants.py')
+                'k_val must be positive, and less than max. tested k_val in constants.py'
+            )
         if b_val > constants.MAX_ALLOWABLE_B_COMMAND or b_val < 0:
             raise ValueError(
-                'b_val must be positive, and less than max. tested b_val in constants.py')
+                'b_val must be positive, and less than max. tested b_val in constants.py'
+            )
         if self.k_val != k_val or self.b_val != b_val:
             # Only send gains when necessary
             self.update_gains(k_val=int(k_val), b_val=int(b_val))
-        fxs.send_motor_command(
-            dev_id=self.dev_id, ctrl_mode=fxe.FX_IMPEDANCE, value=int(theta0))
+        fxs.send_motor_command(dev_id=self.dev_id,
+                               ctrl_mode=fxe.FX_IMPEDANCE,
+                               value=int(theta0))
         self.data.commanded_current = None
         self.data.commanded_position = None
         self.data.commanded_torque = None
 
-    def command_torque(self, desired_torque: float, do_return_command_torque=False, do_ease_torque_off=True):
+    def command_torque(self,
+                       desired_torque: float,
+                       do_return_command_torque=False,
+                       do_ease_torque_off=True):
         '''Applies desired torque (Nm) in plantarflexion only (positive torque)'''
         self.data.commanded_torque = desired_torque  # TODO(maxshep) remove
         if desired_torque < 0:
@@ -436,13 +475,15 @@ class Exo():
 
         # Softly reduce desired torque at high ankle angles when TR approaches 0
         if do_ease_torque_off:
-            reel_in_current = self.motor_sign*1000
+            reel_in_current = self.motor_sign * 1000
             if self.data.ankle_angle > 45:
                 desired_current = reel_in_current  # A small amount to stay reeled in
             elif 40 < self.data.ankle_angle <= 45:  # Window of taper
-                desired_torque = desired_torque*(45-self.data.ankle_angle)/5
-                desired_current = max(reel_in_current, self._ankle_torque_to_motor_current(
-                    torque=desired_torque))
+                desired_torque = desired_torque * (45 -
+                                                   self.data.ankle_angle) / 5
+                desired_current = max(
+                    reel_in_current,
+                    self._ankle_torque_to_motor_current(torque=desired_torque))
             else:
                 desired_current = self._ankle_torque_to_motor_current(
                     torque=desired_torque)
@@ -454,21 +495,27 @@ class Exo():
         if do_return_command_torque:
             return desired_torque
 
-    def command_ankle_impedance(self, theta0_ankle: float, K_ankle: float, B_ankle: float = 0):
+    def command_ankle_impedance(self,
+                                theta0_ankle: float,
+                                K_ankle: float,
+                                B_ankle: float = 0):
         theta0_motor = self.ankle_angle_to_motor_angle(theta0_ankle)
         K_dephy = K_ankle / constants.DEPHY_K_TO_ANKLE_K
         # B_dephy = B_ankle / constants.DEPHY_B_TO_ANKLE_B
-        self.command_motor_impedance(
-            theta0=theta0_motor, k_val=K_dephy, b_val=0)
+        self.command_motor_impedance(theta0=theta0_motor,
+                                     k_val=K_dephy,
+                                     b_val=0)
 
     def command_controller_off(self):
-        fxs.send_motor_command(
-            dev_id=self.dev_id, ctrl_mode=fxe.FX_NONE, value=0)
+        fxs.send_motor_command(dev_id=self.dev_id,
+                               ctrl_mode=fxe.FX_NONE,
+                               value=0)
 
     def command_slack(self, desired_slack=10000):
         if not self.has_calibrated:
             raise ValueError(
-                'Must perform standing calibration before performing this task')
+                'Must perform standing calibration before performing this task'
+            )
         '''Commands position based on desired slack (motor counts)'''
         if desired_slack < 0:
             raise ValueError('Desired slack must be positive')
@@ -476,29 +523,31 @@ class Exo():
         desired_motor_angle = int(
             -1 * self.motor_sign * desired_slack +
             self.ankle_angle_to_motor_angle(self.data.ankle_angle))
-        self.command_motor_angle(
-            desired_motor_angle=desired_motor_angle)
+        self.command_motor_angle(desired_motor_angle=desired_motor_angle)
 
     def get_slack(self):
         '''Returns slack in motor counts, with positive = actual slack.'''
-        slack = -1*self.motor_sign*(self.data.motor_angle -
-                                    self.ankle_angle_to_motor_angle(self.data.ankle_angle))
+        slack = -1 * self.motor_sign * (
+            self.data.motor_angle -
+            self.ankle_angle_to_motor_angle(self.data.ankle_angle))
         return slack
 
     def calculate_max_allowable_torque(self):
         '''Calculates max allowable torque from self.max_allowable_current and ankle_angle.'''
         max_allowable_torque = max(
-            0, self._motor_current_to_ankle_torque(current=self.motor_sign*self.max_allowable_current))
+            0,
+            self._motor_current_to_ankle_torque(current=self.motor_sign *
+                                                self.max_allowable_current))
         return max_allowable_torque
 
     def _motor_current_to_ankle_torque(self, current: int) -> float:
         '''Converts current (mA) to torque (Nm), based on side and transmission ratio (no dynamics)'''
-        motor_torque = current*constants.MOTOR_CURRENT_TO_MOTOR_TORQUE
+        motor_torque = current * constants.MOTOR_CURRENT_TO_MOTOR_TORQUE
         ankle_torque = motor_torque * \
             self.TR_from_ankle_angle(self.data.ankle_angle)
-            # TODO: change manual tuning of splines to be automatic
-            # np.polyval(self.TR_from_ankle_angle, self.data.ankle_angle)
-            
+        # TODO: change manual tuning of splines to be automatic
+        # np.polyval(self.TR_from_ankle_angle, self.data.ankle_angle)
+
         return ankle_torque
 
     def _ankle_torque_to_motor_current(self, torque: float) -> int:
@@ -506,9 +555,9 @@ class Exo():
         motor_torque = torque / \
             self.TR_from_ankle_angle(self.data.ankle_angle)
         # TODO: change manual tuning of splines to be automatic
-        #    np.polyval(self.TR_from_ankle_angle, self.data.ankle_angle) 
-        motor_current = int(
-            motor_torque / constants.MOTOR_CURRENT_TO_MOTOR_TORQUE)
+        #    np.polyval(self.TR_from_ankle_angle, self.data.ankle_angle)
+        motor_current = int(motor_torque /
+                            constants.MOTOR_CURRENT_TO_MOTOR_TORQUE)
 
         return motor_current
 
@@ -516,13 +565,16 @@ class Exo():
         '''Calculate equivalent motor position via polynomial evaluation.'''
         if not self.has_calibrated:
             raise ValueError(
-                'Must perform standing calibration before performing this task')
+                'Must perform standing calibration before performing this task'
+            )
         else:
-            motor_angle = int(np.polyval(
-                self.ankle_to_motor_angle_polynomial, ankle_angle) + self.motor_offset)
+            motor_angle = int(
+                np.polyval(self.ankle_to_motor_angle_polynomial, ankle_angle) +
+                self.motor_offset)
         return motor_angle
 
-    def standing_calibration(self,config: Type[config_util.ConfigurableConstants],
+    def standing_calibration(self,
+                             config: Type[config_util.ConfigurableConstants],
                              calibration_mV: int = 1300,
                              max_seconds_to_calibrate: float = 5,
                              current_threshold: float = 1500,
@@ -534,10 +586,11 @@ class Exo():
         current_filter = filters.MovingAverage(window_size=10)
         self.command_voltage(desired_mV=self.motor_sign * calibration_mV)
         t0 = time.time()
-        while time.time()-t0 < max_seconds_to_calibrate:
+        while time.time() - t0 < max_seconds_to_calibrate:
             time.sleep(0.01)
             self.read_data(config=config)
-            if abs(current_filter.filter(self.data.motor_current)) > current_threshold:
+            if abs(current_filter.filter(
+                    self.data.motor_current)) > current_threshold:
                 calibrated_ankle_angle = self.data.ankle_angle
                 break
         else:
@@ -545,12 +598,13 @@ class Exo():
             self.command_controller_off()
             raise RuntimeError('Calibration Timed Out!!!')
         self.has_calibrated = True
-        self.motor_offset = (self.data.motor_angle -
-                             self.ankle_angle_to_motor_angle(self.data.ankle_angle))
+        self.motor_offset = (
+            self.data.motor_angle -
+            self.ankle_angle_to_motor_angle(self.data.ankle_angle))
         for ramp_down_value in np.arange(1, 0, -0.01):
             time.sleep(0.01)
-            self.command_voltage(desired_mV=ramp_down_value *
-                                 self.motor_sign * calibration_mV)
+            self.command_voltage(desired_mV=ramp_down_value * self.motor_sign *
+                                 calibration_mV)
         self.command_controller_off()
         print('Finished Calibrating ', self.side)
         return calibrated_ankle_angle
