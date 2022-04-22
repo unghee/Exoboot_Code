@@ -8,7 +8,7 @@ import constants
 import config_util
 
 
-def calibrate_encoder_to_ankle_conversion(exo: exoboot.Exo):
+def calibrate_encoder_to_ankle_conversion(c,exo: exoboot.Exo):
     '''This routine can be used to manually calibrate the relationship
     between ankle and motor angles. Move through the full RoM!!!'''
     exo.update_gains(Kp=constants.DEFAULT_KP, Ki=constants.DEFAULT_KI,
@@ -18,8 +18,8 @@ def calibrate_encoder_to_ankle_conversion(exo: exoboot.Exo):
     for _ in range(1000):
         exo.command_current(exo.motor_sign*1000)
         time.sleep(0.02)
-        exo.read_data()
-        exo.write_data()
+        exo.read_data(c)
+        exo.write_data(c,False)
     print('Done! File saved.')
 
 
@@ -29,6 +29,6 @@ if __name__ == '__main__':
     if len(exo_list) > 1:
         raise ValueError("Just turn on one exo for calibration")
     exo = exo_list[0]
-    exo.standing_calibration()
-    calibrate_encoder_to_ankle_conversion(exo=exo)
+    exo.standing_calibration(config)
+    calibrate_encoder_to_ankle_conversion(config,exo=exo)
     exo.close()
