@@ -68,10 +68,10 @@ class ConfigurableConstants():
     SWING_ONLY: bool = False
 
     # 4 point Spline
-    RISE_FRACTION: float = 0.075 #0.2
-    PEAK_FRACTION: float = 0.33535#0.53
-    FALL_FRACTION: float = 0.44478#0.60
-    PEAK_TORQUE: float = 18.96235#5
+    RISE_FRACTION: float = 0.2
+    PEAK_FRACTION: float = 0.53
+    FALL_FRACTION: float = 0.60
+    PEAK_TORQUE: float = 5
     SPLINE_BIAS: float = 3  # Nm
 
     # Impedance
