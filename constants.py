@@ -20,14 +20,16 @@ if (ExoType == ExobootModel.EB45):
     MIN_ANKLE_ANGLE = -45  # degrees, dorsiflexion
 
     # These polynomials are derived from the calibration routine (calibrate.py), analyzed with transmission_analysis.py
-    LEFT_ANKLE_TO_MOTOR = [
+    """LEFT_ANKLE_TO_MOTOR = [
         1.42930145e-05, 9.60847697e-04, 9.66033271e-03, 1.21997272e+00,
         -7.39600859e+02, -2.96580581e+04
-    ]
-    RIGHT_ANKLE_TO_MOTOR = [
+    ]"""
+    LEFT_ANKLE_TO_MOTOR = [ 4.04430823e-06,  8.55008776e-04,  4.16160420e-02,  1.52798433e+00, -7.60189930e+02, -2.98125682e+04]
+    """RIGHT_ANKLE_TO_MOTOR = [
         -1.02595964e-05, -9.28352253e-04, -3.10556810e-02, -1.40767218e+00,
         7.57989378e+02, -3.48608044e+03
-    ]
+    ]"""
+    RIGHT_ANKLE_TO_MOTOR = [-2.07317154e-06, -1.02471558e-03, -4.25686613e-02, -9.64798203e-01, 7.71135655e+02,  1.11783125e+04]
 
     # These points are used to create a Pchip spline, which defines the transmission ratio as a function of ankle angle
     ANKLE_PTS_LEFT = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50,
