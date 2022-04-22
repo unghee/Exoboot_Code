@@ -9,8 +9,8 @@ class ExobootModel(Enum):
     EB51 = 1
 
 
-ExoType: Type[ExobootModel] = ExobootModel.EB51
-#ExoType = Type[ExobootModel] = ExobootModel.EB45
+#ExoType: Type[ExobootModel] = ExobootModel.EB51
+ExoType: Type[ExobootModel] = ExobootModel.EB45
 
 DEFAULT_BAUD_RATE = 230400
 TARGET_FREQ = 200
@@ -41,7 +41,7 @@ if (ExoType == ExobootModel.EB45):
                              -11])  # Nm/Nm
 
     LEFT_ANKLE_ANGLE_OFFSET = 201  #-92  # 7,
-    RIGHT_ANKLE_ANGLE_OFFSET = -150  #-200# deg
+    RIGHT_ANKLE_ANGLE_OFFSET = -198# deg
 
 elif (ExoType == ExobootModel.EB51):
 
@@ -50,27 +50,25 @@ elif (ExoType == ExobootModel.EB51):
     MIN_ANKLE_ANGLE = -95
 
     #EB-51
-    LEFT_ANKLE_TO_MOTOR = np.array([
-        -1.39600219e-06, -1.19669863e-04, 5.18587784e-02, 3.48021800e+00,
-        -5.71389166e+02, -2.84883844e+04
-    ])
+    #LEFT_ANKLE_TO_MOTOR = np.array([-2.27233618e-06,  3.55519545e-05,  4.73297332e-02,  3.18534948e+00,-5.63299330e+02, -2.85391796e+04])
+    LEFT_ANKLE_TO_MOTOR = np.array([-2.41577803e-06,  6.03503507e-05,  4.69647778e-02,  3.14213596e+00,-5.63452288e+02,  2.04918050e+04])
     #LEFT_ANKLE_TO_MOTOR = np.array([-2.32052284e-06, 6.29683551e-05, 4.45431399e-02, 3.09556691e+00,-5.49941515e+02, -1.11211736e+04])  #used for the test trials
 
-    RIGHT_ANKLE_TO_MOTOR = np.array([
-        5.05377935e-06, -2.83727629e-04, -7.31477078e-02, -1.56178494e+00,
-        6.34368537e+02, 9.35489733e+03
-    ])
+    RIGHT_ANKLE_TO_MOTOR = np.array([5.05377935e-06, -2.83727629e-04, -7.31477078e-02, -1.56178494e+00,
+        6.34368537e+02, 9.35489733e+03])
     #RIGHT_ANKLE_TO_MOTOR = np.array([ 5.37977952e-06, -2.76399833e-04, -7.58092528e-02, -1.65003833e+00,6.38860770e+02,  9.21647151e+03]) #used for the test trials
 
     #EB-51
+
     ANKLE_PTS_LEFT = np.array([
-        -67, -60, -47, -40, -20, -10, 0, 10, 20, 30, 40, 45.6, 55, 80, 90, 100,
-        112
+        -67, -60, -50, -40, -20, -10, 0, 10, 20, 30, 40, 45.6, 55, 70, 80, 86
     ])
     TR_PTS_LEFT = np.array([
-        14.85, 14, 11.89, 12.74, 14.28, 13.71, 12.54, 10.43, 8, 5.5, 2.3, 0.4,
-        -3.3, -10, -11.30, -10.95, -8.75
+        15.5, 13.35, 11.95, 12.03, 13.82, 14.3, 13.96, 12.77, 10.56, 7.1, 3.19,
+        0.66, -3.78, -9.55, -12.58, -13.09
     ])
+    #ANKLE_PTS_LEFT = np.array([-67, -60, -47, -40, -30, -20, -10, 0, 10, 20, 30, 40, 45.6, 55, 80, 90,100, 112])
+    #TR_PTS_LEFT = np.array([13.73, 13.5, 13.76, 13.8, 14.04,14.28, 13.71, 12.54, 10.43, 8, 5.5, 2.3, 0.4, -3.3, -10, -11.30, -10.95, -8.75])
 
     #ANKLE_PTS_LEFT = np.array([-67, -60, -40, -20, -10 ,0, 10, 20, 30, 40, 45.6, 55, 80, 90, 100])  #used for the test trials
     #TR_PTS_LEFT = np.array([14.85, 14, 13.8, 13.7, 13.16, 12, 10.43, 8, 5.5, 2.3, 0.4, -3.3, -10, -11.30, -10.95])  #used for the test trials
@@ -91,8 +89,8 @@ elif (ExoType == ExobootModel.EB51):
     # RIGHT_ANKLE_TO_TR = np.array([ 4.83188447e-07, -3.83712114e-05, -3.61934700e-03,  4.54812251e-01,
     #        -2.89416189e+01]) ## NEED TO CHANGE FOR RIGHT ANKLE
 
-    #EB-51
-    LEFT_ANKLE_ANGLE_OFFSET = -67  # deg
+    #EB-67#-51
+    LEFT_ANKLE_ANGLE_OFFSET = -67#-95#-67  # deg
     RIGHT_ANKLE_ANGLE_OFFSET = 87.1  #100  # deg
 
 # Add to these lists if dev_ids change, or new exos or actpacks are purchased!
