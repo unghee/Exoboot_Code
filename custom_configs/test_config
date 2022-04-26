@@ -1,0 +1,8 @@
+
+import config_util
+config = config_util.ConfigurableConstants()
+
+config.RISE_FRACTION: float = 0.376400032043457#0.2#0.075 
+config.PEAK_FRACTION: float = 0.59497730255127#0.53#0.33535#
+config.FALL_FRACTION: float = 0.65#0.60#0.44478#
+config.PEAK_TORQUE: float = 17.2818012237549#5#18.96235#
