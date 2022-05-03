@@ -68,10 +68,10 @@ class ConfigurableConstants():
     SWING_ONLY: bool = False
 
     # 4 point Spline
-    RISE_FRACTION: float = 0.2
-    PEAK_FRACTION: float = 0.53
-    FALL_FRACTION: float = 0.60
-    PEAK_TORQUE: float = 5
+    RISE_FRACTION: float = 0.2  #0.075
+    PEAK_FRACTION: float = 0.53  #0.33535#
+    FALL_FRACTION: float = 0.60  #0.44478#
+    PEAK_TORQUE: float = 5  #18.96235#
     SPLINE_BIAS: float = 3  # Nm
 
     # Impedance
@@ -105,7 +105,6 @@ class ConfigurableConstants():
     #Needed for the Exosekeleton (EB 45, EB 51)
     resetting_time = 685  # the Exoboot typically stops updating after 731 seconds
     controller_stop_time = 710
-
 
 
 class ConfigSaver():

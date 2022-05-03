@@ -56,38 +56,16 @@ for filename in ["Final_test_LEFT_1.csv"]:
 
     plt.plot(ankle_angle,
             -1*TR_from_ankle_angle(ankle_angle),
-            linewidth=5,
-            label="auto LEFT"
+            linewidth=2,
+            label="auto left"
             )  #Multiply -1 to TR_from-ankle_angle(ankle_angle) for Left
 
     #RIGHT
     ankle_pts = np.array(
-        [
-            -67, -60, -50, -40, -20, -10, 0, 10, 20, 30, 40, 45.6, 55, 70, 80,
-            86
-        ]
-    )  #np.array([-67, -60, -50, -40, -20, -10 ,0, 10, 20, 30, 40, 45.6, 55, 80, 90])
+        [-40, -20, 0, 10, 20, 30, 40, 45.6, 50,55])  #np.array([-67, -60, -50, -40, -20, -10 ,0, 10, 20, 30, 40, 45.6, 55, 80, 90])
 
-    deriv_pts = np.array(
-        [
-            15.5, 13.35, 11.95, 12.03, 13.82, 14.3, 13.96, 12.77, 10.56, 7.1,
-            3.19, 0.66, -3.78, -9.55, -12.58, -13.09
-        ]
-    )  #np.array([15.5, 13.35, 11.95, 12.03, 13.82, 14.3, 13.96, 12.77, 10.56, 7.1, 3.19, 0.4, -3.78, -11.94, -12.3])
+    deriv_pts = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5,-11])  #np.array([15.5, 13.35, 11.95, 12.03, 13.82, 14.3, 13.96, 12.77, 10.56, 7.1, 3.19, 0.4, -3.78, -11.94, -12.3])
 
-    #LEFT
-    ankle_pts = np.array(
-        [
-            -67, -60, -47, -40, -30, -20, -10, 0, 10, 20, 30, 40, 45.6, 55, 80, 90,
-            100, 112
-        ]
-    )  #np.array([-67, -60, -40, -20, -10 ,0, 10, 20, 30, 40, 45.6, 55, 80, 90, 100])
-    deriv_pts = np.array(
-        [
-            13.73, 13.5, 13.76, 13.8, 14.04,14.28, 13.71, 12.54, 10.43, 8, 5.5, 2.3,
-            0.4, -3.3, -10, -11.30, -10.95, -8.75
-        ]
-    )  #np.array([14.85, 14, 13.8, 13.7, 13.16, 12, 10.43, 8, 5.5, 2.3, 0.4, -3.3, -10, -11.30, -10.95])
 
     #DEFAULT
     #ankle_pts = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50, 55])  # Deg
@@ -96,7 +74,7 @@ for filename in ["Final_test_LEFT_1.csv"]:
     deriv_spline_fit = interpolate.pchip_interpolate(ankle_pts, deriv_pts,
                                                     ankle_angle)
 
-    plt.plot(ankle_angle, deriv_spline_fit, linewidth=5, label="pchip manual LEFT ")
+    #plt.plot(ankle_angle, deriv_spline_fit, linewidth=5, label="pchip manual for left")
     plt.legend()
     plt.ylabel('Transmission Ratio')
     plt.xlabel('Ankle Angle')
@@ -107,8 +85,7 @@ for filename in ["Final_test_LEFT_1.csv"]:
         np.polyval(p_deriv, ankle_angle[50])
 
 #################################################
-
-for filename in ["Final_test_RIGHT_1.csv"]:
+for filename in ["Final_test_RIGHT_2.csv"]:
     with open(folder + filename) as f:
         motor_angle = [int(row["motor_angle"]) for row in csv.DictReader(f)]
     with open(folder + filename) as f:
@@ -128,8 +105,8 @@ for filename in ["Final_test_RIGHT_1.csv"]:
 
     # Polyfit
     p = np.polyfit(ankle_angle,
-                   motor_angle / constants.ENC_CLICKS_TO_DEG,
-                   deg=5)
+                motor_angle / constants.ENC_CLICKS_TO_DEG,
+                deg=5)
     print('Polynomial coefficients: ', p)
 
     p_deg = np.polyfit(ankle_angle, motor_angle, deg=5)
@@ -148,46 +125,42 @@ for filename in ["Final_test_RIGHT_1.csv"]:
     print('Polynomial deriv coefficients: ', p_deriv)
 
     TR_from_polyfit = np.polyval(p_deriv, ankle_angle)
-    plt.plot(ankle_angle, -TR_from_polyfit, label="polyfit")
+    #plt.plot(ankle_angle, -TR_from_polyfit, label="polyfit")
 
     TR_from_ankle_angle = interpolate.PchipInterpolator(
         ankle_angle, TR_from_polyfit)
 
     plt.plot(ankle_angle,
-             TR_from_ankle_angle(ankle_angle),
-             linewidth=5,
-             label="auto RIGHT"
-             )  #Multiply -1 to TR_from-ankle_angle(ankle_angle) for Left
+            TR_from_ankle_angle(ankle_angle),
+            linewidth=2,
+            label="auto RIGHT"
+            )  #Multiply -1 to TR_from-ankle_angle(ankle_angle) for Left
 
     #RIGHT
     ankle_pts = np.array(
-        [
-         -50, -40, -20, -10, 0, 10, 20, 30, 40, 45.6, 55, 70, 80,
-            86
-        ]
-    )  #np.array([-67, -60, -50, -40, -20, -10 ,0, 10, 20, 30, 40, 45.6, 55, 80, 90])
-    deriv_pts = np.array([
-         20.95, 19.03, 17.82, 17.3, 16.96, 15.77, 13.96, 10.5, 4.19,
-        -0.66, -10.98, -17.55, -18.58, -20.09
-    ])  #n
+        [-40, -20, 0, 10, 20, 30, 40, 45.6, 50,55])  #np.array([-67, -60, -50, -40, -20, -10 ,0, 10, 20, 30, 40, 45.6, 55, 80, 90])
 
-    ankle_pts = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50,
-                               55])  # Deg
-    deriv_pts = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5,
-                            -11])  # 
+    deriv_pts = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5,-11])  #np.array([15.5, 13.35, 11.95, 12.03, 13.82, 14.3, 13.96, 12.77, 10.56, 7.1, 3.19, 0.4, -3.78, -11.94, -12.3])
 
+
+
+    #DEFAULT
+    #ankle_pts = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50, 55])  # Deg
+    #deriv_pts = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5, -11 ])
 
     deriv_spline_fit = interpolate.pchip_interpolate(ankle_pts, deriv_pts,
-                                                     ankle_angle)
+                                                    ankle_angle)
 
-    plt.plot(ankle_angle,deriv_spline_fit,linewidth=5,label="pchip manual RIGHT")
+    plt.plot(ankle_angle, deriv_spline_fit, linewidth=2, label="pchip manual")
     plt.legend()
     plt.ylabel('Transmission Ratio')
-    plt.xlabel('Ankle Angleeeee')
+    plt.xlabel('Ankle Angle')
 
     motor_torque = constants.MAX_ALLOWABLE_CURRENT_COMMAND * constants.MOTOR_CURRENT_TO_MOTOR_TORQUE
 
     ankle_torque = motor_torque * \
         np.polyval(p_deriv, ankle_angle[50])
+
+    plt.axhline(0, linewidth = 2,linestyle='dotted',color='green')
 
 plt.show()
