@@ -42,8 +42,8 @@ if (ExoType == ExobootModel.EB45):
     TR_PTS_RIGHT = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5,
                              -11])  # Nm/Nm
 
-    LEFT_ANKLE_ANGLE_OFFSET = 199#201  #-92  # 7,
-    RIGHT_ANKLE_ANGLE_OFFSET = -200#-198# deg
+    LEFT_ANKLE_ANGLE_OFFSET = 198.5#201.5#201  #-92  # 7,
+    RIGHT_ANKLE_ANGLE_OFFSET = -204.5#-195.5#-198# deg
 
 elif (ExoType == ExobootModel.EB51):
 

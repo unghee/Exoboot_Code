@@ -9,7 +9,7 @@ import constants
 
 folder = 'exo_data/'
 
-for filename in ["20220425_2352_calibration2_LEFT.csv"]:
+for filename in ["20220427_0138_calibration2_LEFT.csv"]:
     with open(folder + filename) as f:
         motor_angle = [int(row["motor_angle"]) for row in csv.DictReader(f)]
     with open(folder + filename) as f:
@@ -33,13 +33,13 @@ for filename in ["20220425_2352_calibration2_LEFT.csv"]:
 
 
     temp_left = []
-    for i in range(50,250):
+    for i in range(50,850):
         temp_left.append(ankle_angle[i])
     
     #print(ankle_angle)
     print("Average Ankle Angle Left", np.mean(temp_left))
 
-for filename in ["20220425_2353_calibration2_RIGHT.csv"]:
+for filename in ["20220427_0132_calibration2_RIGHT.csv"]:
     with open(folder + filename) as f:
         motor_angle = [int(row["motor_angle"]) for row in csv.DictReader(f)]
     with open(folder + filename) as f:
@@ -63,7 +63,7 @@ for filename in ["20220425_2353_calibration2_RIGHT.csv"]:
 
 
     temp_right = []
-    for i in range(50,250):
+    for i in range(50,850):
         temp_right.append(ankle_angle[i])
     
     #print(ankle_angle)
