@@ -16,7 +16,7 @@ def calibrate_encoder_to_ankle_conversion(c,exo: exoboot.Exo):
     # exo.command_current(exo.motor_sign*1000)
     print('begin!')
     temp_ankle_angle_array = []
-    for _ in range(750):
+    for _ in range(1000):
         exo.command_current(exo.motor_sign*1000)
         time.sleep(0.02)
         exo.read_data(c)
