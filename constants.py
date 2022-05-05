@@ -24,26 +24,32 @@ if (ExoType == ExobootModel.EB45):
         1.42930145e-05, 9.60847697e-04, 9.66033271e-03, 1.21997272e+00,
         -7.39600859e+02, -2.96580581e+04
     ]"""
-    LEFT_ANKLE_TO_MOTOR = [ 4.04430823e-06,  8.55008776e-04,  4.16160420e-02,  1.52798433e+00, -7.60189930e+02, -2.98125682e+04]
+    LEFT_ANKLE_TO_MOTOR =[-3.86292446e-07,  9.87137568e-04,  5.46736005e-02,  1.28446551e+00, -7.72594712e+02,  2.48046256e+03]
+    #LEFT_ANKLE_TO_MOTOR = [ 4.04430823e-06,  8.55008776e-04,  4.16160420e-02,  1.52798433e+00, -7.60189930e+02, -2.98125682e+04] #Old TRansmission curve before subject 09
     """RIGHT_ANKLE_TO_MOTOR = [
         -1.02595964e-05, -9.28352253e-04, -3.10556810e-02, -1.40767218e+00,
         7.57989378e+02, -3.48608044e+03
     ]"""
-    RIGHT_ANKLE_TO_MOTOR = [-2.07317154e-06, -1.02471558e-03, -4.25686613e-02, -9.64798203e-01, 7.71135655e+02,  1.11783125e+04]
+    RIGHT_ANKLE_TO_MOTOR = [-1.39129122e-06, -1.07898390e-03, -4.85073970e-02, -9.89240927e-01, 7.75903076e+02,  4.47861727e+04]
+    #RIGHT_ANKLE_TO_MOTOR = [-2.07317154e-06, -1.02471558e-03, -4.25686613e-02, -9.64798203e-01, 7.71135655e+02,  1.11783125e+04] #Old TRansmission curve before subject 09
 
     # These points are used to create a Pchip spline, which defines the transmission ratio as a function of ankle angle
-    ANKLE_PTS_LEFT = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50,
+    #old
+    """ANKLE_PTS_LEFT = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50,
                                55])  # Deg
     TR_PTS_LEFT = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5,
-                            -11])  # Nm/Nm
+                            -11])  # Nm/Nm"""
 
-    ANKLE_PTS_RIGHT = np.array([-40, -20, 0, 10, 20, 30, 40, 45.6, 50,
-                                55])  # Deg
-    TR_PTS_RIGHT = np.array([19, 17, 16.5, 15.5, 13.5, 10, 4, -1, -5,
-                             -11])  # Nm/Nm
+    
+    ANKLE_PTS_LEFT = np.array([-40, -20, -10, 0, 10, 20, 30, 40, 45.6, 50, 55])
 
-    LEFT_ANKLE_ANGLE_OFFSET = 198.5#201.5#201  #-92  # 7,
-    RIGHT_ANKLE_ANGLE_OFFSET = -204.5#-195.5#-198# deg
+    TR_PTS_LEFT = np.array([19, 17.37, 17.2, 17, 16.1, 13.7, 10, 3.7, -1, -5, -11])
+    
+    ANKLE_PTS_RIGHT = np.array([-40, -20, -10, 0, 10, 20, 30, 40, 45.6, 50, 55]) # Deg
+    TR_PTS_RIGHT = np.array([19, 17.37, 17.2, 17, 16.1, 13.7, 10, 3.7, -1, -5, -11])# Nm/Nm
+
+    LEFT_ANKLE_ANGLE_OFFSET = 201#198.5#201.5#201  #-92  # 7,
+    RIGHT_ANKLE_ANGLE_OFFSET = -198.63#-204.5#-195.5#-198# deg
 
 elif (ExoType == ExobootModel.EB51):
 
