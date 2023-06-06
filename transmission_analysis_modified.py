@@ -9,7 +9,7 @@ import constants
 folder = 'exo_data/'
 # for filename in ["20220210_1440_calibration2_LEFT.csv"]:
 # for filename in ["20220216_1229_calibration2_LEFT.csv"]:
-for filename in ["1_RIGHT.csv"]:
+for filename in ["20230602_1845_calibration_2_2ndJUne_RIGHT.csv"]:
     with open(folder + filename) as f:
         motor_angle = [int(row["motor_angle"]) for row in csv.DictReader(f)]
     with open(folder + filename) as f:

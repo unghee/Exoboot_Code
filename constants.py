@@ -9,8 +9,8 @@ class ExobootModel(Enum):
     EB51 = 1
 
 
-#ExoType: Type[ExobootModel] = ExobootModel.EB51
-ExoType: Type[ExobootModel] = ExobootModel.EB45
+ExoType: Type[ExobootModel] = ExobootModel.EB51
+#ExoType: Type[ExobootModel] = ExobootModel.EB45
 
 DEFAULT_BAUD_RATE = 230400
 TARGET_FREQ = 200
@@ -48,8 +48,8 @@ if (ExoType == ExobootModel.EB45):
     ANKLE_PTS_RIGHT = np.array([-40, -20, -10, 0, 10, 20, 30, 40, 45.6, 50, 55]) # Deg
     TR_PTS_RIGHT = np.array([19, 17.37, 17.2, 17, 16.1, 13.7, 10, 3.7, -1, -5, -11])# Nm/Nm
 
-    LEFT_ANKLE_ANGLE_OFFSET = 201#198.5#201.5#201  #-92  # 7,
-    RIGHT_ANKLE_ANGLE_OFFSET = -198.63#-204.5#-195.5#-198# deg
+    LEFT_ANKLE_ANGLE_OFFSET = 193#198.5#201.5#201  #-92  # 7,
+    RIGHT_ANKLE_ANGLE_OFFSET = -212.63#-204.5#-195.5#-198# deg
 
 elif (ExoType == ExobootModel.EB51):
 

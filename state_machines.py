@@ -82,6 +82,7 @@ class StanceSwingStateMachine(HighLevelController):
         self.controller_now = self.swing_controller
 
     def step(self, read_only=False):
+        print("Here.....................")
         # Check state machine transition criteria, switching controller_now if criteria are met
         if (self.controller_now == self.swing_controller and
             self.exo.data.did_heel_strike and
@@ -156,6 +157,7 @@ class StanceSwingReeloutReelinStateMachine(HighLevelController):
             did_controllers_switch = False
 
         if not read_only:
+            #*self.controller_now.command(reset=did_controllers_switch)
             self.controller_now.command(reset=did_controllers_switch)
 
     def update_ctrl_params_from_config(self, config):

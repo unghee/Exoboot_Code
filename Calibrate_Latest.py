@@ -29,7 +29,7 @@ def calibrate_encoder_to_ankle_conversion(c,exo: exoboot.Exo):
 
 if __name__ == '__main__':
     config = config_util.load_config_from_args() 
-    exo_list = exoboot.connect_to_exos(file_ID='calibration2',config=config)
+    exo_list = exoboot.connect_to_exos(file_ID='calibration2_2ndJune',config=config)
     if len(exo_list) > 1:
         raise ValueError("Just turn on one exo for calibration")
     exo = exo_list[0]
