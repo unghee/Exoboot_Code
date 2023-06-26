@@ -100,8 +100,8 @@ while True:
         for exo in exo_list:
             exo.read_data(config=config,loop_time=loop_time)
         for gait_state_estimator in gait_state_estimator_list:
-            gait_state_estimator.detect()
-            """t = gait_state_estimator.detect()
+            #gait_state_estimator.detect()
+            t = gait_state_estimator.detect()
             if(heel_strike_counter >= 1):
                 t_1.append(exo.data.ankle_angle)
                 t_2.append(exo.data.ankle_velocity)
@@ -115,19 +115,20 @@ while True:
                     t_1 = []
                     t_2 = []
                 if(heel_strike_counter % 10 == 0):
-                    temp_ankle_angle = np.array(temp_ankle_angle).sum(axis=0) / 5
-                    temp_ankle_angular_velocity = np.array(temp_ankle_angular_velocity).sum(axis=0) / 5
+                    temp_ankle_angle = np.array(temp_ankle_angle).sum(axis=0) / 9
+                    temp_ankle_angular_velocity = np.array(temp_ankle_angular_velocity).sum(axis=0) / 9
                     communication_thread.sending_data(temp_ankle_angle, temp_ankle_angular_velocity) #ToDo take care of two Exo
                     temp_ankle_angle = []
                     temp_ankle_angular_velocity = []
-                    print("Outside the loop")"""
+                    #print("Outside the loop")
         #print("further outside...")
         if not config.READ_ONLY:
             for state_machine in state_machine_list:
-                state_machine.step(read_only=config.READ_ONLY)
+                #print("Torque prolie",config.torque_profile)
+                state_machine.step(config = config, read_only=config.READ_ONLY)
         for exo in exo_list:
             exo.write_data(config=config,only_write_if_new=only_write_if_new)
-            print("Exo torque", exo.data.ankle_torque_from_current)
+            #print("Exo torque", exo.data.ankle_torque_from_current)
 
         """if (int(loop_time % 20) == 0):
             print("Loop TIme", loop_time)

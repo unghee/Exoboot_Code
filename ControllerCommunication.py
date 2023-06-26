@@ -42,11 +42,11 @@ class ControllerCommunication(threading.Thread):
             if(self.stride_counter == 2):
                 print("Sending values")
                 #print(exo.data.ankle_angle)"""
-        print("Sending values")
+        #print("Sending values")
         with grpc.insecure_channel(
                 self.config.CONTROLLER_ALGORITHM_COMMUNICATION, options=(('grpc.enable_http_proxy',0), )) as channel:
             try:
-                print("Sending.............")
+                #print("Sending.............")
                 stub = Message_pb2_grpc.ControllerAlgorithmStub(channel)
                 response = stub.ControllerMessage(
                     Message_pb2.ControllerPing(ankle_angle = ankle_a, ankle_angular_velocity = ankle_v))
@@ -65,8 +65,8 @@ class ControllerCommunication(threading.Thread):
             self.ControllerCommunication = ControllerCommunication
         
         def ActionMessage(self,request,context):
-            print("Action received", request.action_torque_profile)
-            config_util.torque_profile = request.action_torque_profile
+            print("Action received")#, request.action_torque_profile)
+            self.ControllerCommunication.config.torque_profile= request.action_torque_profile
             self.ControllerCommunication.action_received = True
             return Message_pb2.Null()
 

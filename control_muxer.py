@@ -41,9 +41,9 @@ def get_gse_and_sm_lists(exo_list, config: Type[config_util.ConfigurableConstant
             gait_state_estimator_list.append(gait_state_estimator)
 
             # Define State Machine
-            reel_in_controller = controllers.SmoothReelInController(
+            reel_in_controller = controllers.SmoothReelInController(config=config,
                 exo=exo, reel_in_mV=config.REEL_IN_MV, slack_cutoff=config.REEL_IN_SLACK_CUTOFF, time_out=config.REEL_IN_TIMEOUT)
-            swing_controller = controllers.StalkController(
+            swing_controller = controllers.StalkController(config,
                 exo=exo, desired_slack=config.SWING_SLACK)
             if config.STANCE_CONTROL_STYLE == config_util.StanceCtrlStyle.FOURPOINTSPLINE:
                 reel_out_controller = controllers.SoftReelOutController(
@@ -59,12 +59,13 @@ def get_gse_and_sm_lists(exo_list, config: Type[config_util.ConfigurableConstant
                 stance_controller = controllers.SawickiWickiController(
                     exo=exo, k_val=config.K_VAL, b_val=config.B_VAL)
             elif config.STANCE_CONTROL_STYLE == config_util.StanceCtrlStyle.VARUN:
-                reel_out_controller = controllers.SoftReelOutController(
+                print("Running Varun Continuous Torque controller")
+                reel_out_controller = controllers.SoftReelOutController(config,
                     exo=exo, desired_slack=config.SWING_SLACK)
-                stance_controller = controllers.VarunContinuousTorqueController(exo=exo)
+                stance_controller = controllers.VarunContinuousTorqueController(config,exo=exo, torques=config.torque_profile)
 
 
-            state_machine = state_machines.StanceSwingReeloutReelinStateMachine(exo=exo,
+            state_machine = state_machines.StanceSwingReeloutReelinStateMachine(config=config,exo=exo,
                                                                                 stance_controller=stance_controller,
                                                                                 swing_controller=swing_controller,
                                                                                 reel_in_controller=reel_in_controller,
