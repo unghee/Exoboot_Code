@@ -96,8 +96,8 @@ elif (ExoType == ExobootModel.EB51):
     #        -2.89416189e+01]) ## NEED TO CHANGE FOR RIGHT ANKLE
 
     #EB-67#-51
-    LEFT_ANKLE_ANGLE_OFFSET = -67#-95#-67  # deg
-    RIGHT_ANKLE_ANGLE_OFFSET = 87.1  #100  # deg
+    LEFT_ANKLE_ANGLE_OFFSET = -80#*-67#-95#-67  # deg
+    RIGHT_ANKLE_ANGLE_OFFSET = 93.1#*87.1  #100  # deg
 
 # Add to these lists if dev_ids change, or new exos or actpacks are purchased!
 

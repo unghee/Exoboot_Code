@@ -30,7 +30,7 @@ class ControllerCommunication(threading.Thread):
     #def storing_the_stride_values(self):
 
 
-    def sending_data(self, ankle_a, ankle_v):
+    def sending_data(self, ankle_a, ankle_v, exo_side):
         for exo in self.exo_list:
             #print(exo.data.did_heel_strike, self.temp_ankle_angle, self.temp_ankle_angular_velocity)
             """if (exo.data.did_heel_strike == True):
@@ -46,11 +46,11 @@ class ControllerCommunication(threading.Thread):
         with grpc.insecure_channel(
                 self.config.CONTROLLER_ALGORITHM_COMMUNICATION, options=(('grpc.enable_http_proxy',0), )) as channel:
             try:
-                #print("Sending.............")
+                print("Sending.............")
                 stub = Message_pb2_grpc.ControllerAlgorithmStub(channel)
                 response = stub.ControllerMessage(
-                    Message_pb2.ControllerPing(ankle_angle = ankle_a, ankle_angular_velocity = ankle_v))
-                print('Response', response) 
+                    Message_pb2.ControllerPing(ankle_angle = ankle_a, ankle_angular_velocity = ankle_v, exo_side=exo_side))
+                print('Response received') 
                 #Message_pb2.ControllerPing(ankle_angle = exo.data.ankle_angle, ankle_angular_velocity = exo.data.ankle_velocity))
             except grpc.RpcError as e:
                 print("ERROR!!!!: ", e, "Check if the Computer IP is correct or if the computer side server is running")
@@ -66,8 +66,11 @@ class ControllerCommunication(threading.Thread):
         
         def ActionMessage(self,request,context):
             print("Action received")#, request.action_torque_profile)
-            self.ControllerCommunication.config.torque_profile= request.action_torque_profile
+            self.ControllerCommunication.config.torque_profile = request.action_torque_profile
+            time.sleep(10) #Waiting for the action to be implemented on the exo
             self.ControllerCommunication.action_received = True
+            self.ControllerCommunication.config.action_received = True
+            self.ControllerCommunication.new_params_event.set()
             return Message_pb2.Null()
 
     def server_to_receive_actions_for_the_controller(self):

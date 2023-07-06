@@ -21,6 +21,9 @@ from scipy.signal import savgol_filter
 import numpy as np
 import matplotlib.pyplot as plt
 
+#Real-time plotting
+from rtplot import client
+import math
 
 config = config_util.load_config_from_args()  # loads config from passed args
 file_ID = input(
@@ -75,16 +78,38 @@ for exo in exo_list:
     exo.read_data(config)
 t0_state_time = exo.data.state_time
 
-heel_strike_counter = 0
-t_1  = []
-t_2  = []
-temp_ankle_angle = []
-temp_ankle_angular_velocity = []
+heel_strike_counter_left = 0
+t_1_left  = []
+t_2_left  = []
+temp_ankle_angle_left = []
+temp_ankle_angular_velocity_left = []
+
+heel_strike_counter_right = 0
+t_1_right  = []
+t_2_right  = []
+temp_ankle_angle_right = []
+temp_ankle_angular_velocity_right = []
+
+angle_l = []
+angle_r = []
+
+#ip address for the server -- RealTimePlotting
+client.configure_ip('35.3.109.236')#("141.212.77.23")
+
+plot_1_configs = {'names': ['Ankle Angle Left'], 'title': "Ankle Angle Left", 'colors': ['r'], 'ylabel': "degrees", 'xlabel': 'timestep'}
+plot_1_1_configs = {'names': ['Ankle Angle Right'], 'title': "Ankle Angle Right", 'colors': ['m'], 'ylabel': "degrees", 'xlabel': 'timestep'}
+plot_2_configs = {'names': ['Ankle Torque'], 'title': "Ankle Torque", 'colors': ['g'], 'ylabel': "Nm", 'xlabel': 'timestep'}
+plot_3_configs = {'names': ['Ankle velocity'], 'title': "Ankle Velocity", 'colors': ['b'], 'ylabel': "deg/sec", 'xlabel': 'timestep'}
+plot_4_configs = {'names': ['Commanded Torque'], 'title': "Commanded Torque Exoboot", 'colors': ['y'], 'ylabel': "Nm", 'xlabel': 'timestep'}
+All_plots = [plot_1_configs, plot_1_1_configs, plot_2_configs, plot_4_configs, plot_3_configs]
+client.initialize_plots(All_plots)
+#client.initialize_plots(["Commanded Torque"])
+plotting_counter = 0
+config.action_received = True
 while True:
     try:
         timer.pause()
         loop_time = time.perf_counter() - t0
-
         lock.acquire()
         if new_params_event.is_set():
             config_saver.write_data(loop_time=loop_time)  # Update config file
@@ -96,38 +121,105 @@ while True:
         if quit_event.is_set():  # If user enters "quit"
             break
         lock.release()
-
         for exo in exo_list:
             exo.read_data(config=config,loop_time=loop_time)
         for gait_state_estimator in gait_state_estimator_list:
             #gait_state_estimator.detect()
             t = gait_state_estimator.detect()
-            if(heel_strike_counter >= 1):
-                t_1.append(exo.data.ankle_angle)
-                t_2.append(exo.data.ankle_velocity)
-            if(t == True): #Uncomment for actual runnning
-                heel_strike_counter += 1
-                if(heel_strike_counter % 2 == 0):
-                    print(len(t_1))
-                    print(len(t_2))
-                    temp_ankle_angle.append(scipy.signal.resample(t_1,500)) #I have selected 500, I need to tune it!!!!
-                    temp_ankle_angular_velocity.append(scipy.signal.resample(t_2, 500))
-                    t_1 = []
-                    t_2 = []
-                if(heel_strike_counter % 10 == 0):
-                    temp_ankle_angle = np.array(temp_ankle_angle).sum(axis=0) / 9
-                    temp_ankle_angular_velocity = np.array(temp_ankle_angular_velocity).sum(axis=0) / 9
-                    communication_thread.sending_data(temp_ankle_angle, temp_ankle_angular_velocity) #ToDo take care of two Exo
-                    temp_ankle_angle = []
-                    temp_ankle_angular_velocity = []
-                    #print("Outside the loop")
+            if(config.action_received == True and exo.side.value == 2):
+                #print("Left Exo")
+                if(heel_strike_counter_left >= 1):
+                    #print("Appending the states...")
+                    t_1_left.append(exo.data.ankle_angle)
+                    t_2_left.append(exo.data.ankle_velocity)
+                if(t == True): #Uncomment for actual runnning
+                    heel_strike_counter_left += 1
+                    if(heel_strike_counter_left % 2 == 0):
+                        print(len(t_1_left))
+                        print(len(t_2_left))
+                        temp_ankle_angle_left.append(scipy.signal.resample(t_1_left,500)) #I have selected 500, I need to tune it!!!!
+                        temp_ankle_angular_velocity_left.append(scipy.signal.resample(t_2_left, 500))
+                        t_1_left = []
+                        t_2_left = []
+                    if(heel_strike_counter_left % 9 == 0):
+                        print("length",len(temp_ankle_angle_left))
+                        temp_ankle_angle_left = np.delete(temp_ankle_angle_left, 0, 0) #Removing the first two steps data, as it takes a few steps for the exo to activate the desired torque
+                        temp_ankle_angle_left = np.delete(temp_ankle_angle_left, 0, 0)
+
+                        temp_ankle_angle_left = np.array(temp_ankle_angle_left).sum(axis=0) / 2
+                        temp_ankle_angular_velocity_left = np.delete(temp_ankle_angular_velocity_left, 0, 0)
+                        temp_ankle_angular_velocity_left = np.delete(temp_ankle_angular_velocity_left, 0, 0)
+
+                        temp_ankle_angular_velocity_left = np.array(temp_ankle_angular_velocity_left).sum(axis=0) / 2
+                        communication_thread.sending_data(temp_ankle_angle_left, temp_ankle_angular_velocity_left, exo.side.value) #ToDo take care of two Exo
+                        config.action_received = False
+                        temp_ankle_angle_left = []
+                        temp_ankle_angular_velocity_left = []
+                        heel_strike_counter_left = 0
+                        #print("Outside the loop")
+            elif(config.action_received == True and exo.side.value == 1):
+                #print("Right Exo")
+                if(heel_strike_counter_right >= 1):
+                    #print("Appending the states...")
+                    t_1_right.append(exo.data.ankle_angle)
+                    t_2_right.append(exo.data.ankle_velocity)
+                if(t == True): #Uncomment for actual runnning
+                    heel_strike_counter_right += 1
+                    if(heel_strike_counter_right % 2 == 0):
+                        print(len(t_1_right))
+                        print(len(t_2_right))
+                        temp_ankle_angle_right.append(scipy.signal.resample(t_1_right,500)) #I have selected 500, I need to tune it!!!!
+                        temp_ankle_angular_velocity_right.append(scipy.signal.resample(t_2_right, 500))
+                        t_1_right = []
+                        t_2_right = []
+                    if(heel_strike_counter_right % 9 == 0):
+                        print("length",len(temp_ankle_angle_right))
+                        temp_ankle_angle_right = np.delete(temp_ankle_angle_right, 0, 0) #Removing the first two steps data, as it takes a few steps for the exo to activate the desired torque
+                        temp_ankle_angle_right = np.delete(temp_ankle_angle_right, 0, 0)
+
+                        temp_ankle_angle_right = np.array(temp_ankle_angle_right).sum(axis=0) / 2
+                        temp_ankle_angular_velocity_right = np.delete(temp_ankle_angular_velocity_right, 0, 0)
+                        temp_ankle_angular_velocity_right = np.delete(temp_ankle_angular_velocity_right, 0, 0)
+
+                        temp_ankle_angular_velocity_right = np.array(temp_ankle_angular_velocity_right).sum(axis=0) / 2
+                        communication_thread.sending_data(temp_ankle_angle_right, temp_ankle_angular_velocity_right, exo.side.value) #ToDo take care of two Exo
+                        config.action_received = False
+                        temp_ankle_angle_right = []
+                        temp_ankle_angular_velocity_right = []
+                        heel_strike_counter_right = 0
+                        #print("Outside the loop")            
+            else:
+                pass
         #print("further outside...")
         if not config.READ_ONLY:
             for state_machine in state_machine_list:
-                #print("Torque prolie",config.torque_profile)
+                #print("Torque", config.torque_profile)
                 state_machine.step(config = config, read_only=config.READ_ONLY)
         for exo in exo_list:
             exo.write_data(config=config,only_write_if_new=only_write_if_new)
+            #RealTimePlotting
+            exo.data.commanded_torque = np.asarray(exo.data.commanded_torque)
+            exo.data.commanded_torque = exo.data.commanded_torque.astype(float)
+            if(math.isnan(exo.data.commanded_torque)):
+                t_commanded = 0
+            else:
+                t_commanded = exo.data.commanded_torque
+
+            if(exo.side.value == 1):
+                #print('right')
+                angle_r = exo.data.ankle_angle
+            elif(exo.side.value == 2):
+                #print('Left')
+                angle_l = exo.data.ankle_angle
+            else:
+                pass
+            plotting_data = [angle_l, angle_r, exo.data.ankle_torque_from_current, t_commanded,exo.data.ankle_velocity]
+            plotting_counter += 1
+            if(plotting_counter%6 == 0):
+                client.send_array(plotting_data)
+            """t_plotting = np.asarray(config.torque_profile)
+            t_plotting = t_plotting.astype(float)
+            client.send_array(t_plotting)"""
             #print("Exo torque", exo.data.ankle_torque_from_current)
 
         """if (int(loop_time % 20) == 0):

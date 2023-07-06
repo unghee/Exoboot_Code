@@ -19,7 +19,7 @@ class Controller(object):
         self.exo = exo
         self.config= config
 
-    def command(self, config,reset):
+    def command(self, config, reset):
         '''For modularity, new controllers will ideally not take any arguments with
         their command() function. The exo object stored on self will have updated
         data, which is accessible to controller objects.'''
@@ -35,7 +35,7 @@ class Controller(object):
     def command_gains(self):
         self.exo.update_gains(Kp=self.Kp, Ki=self.Ki, Kd=self.Kd, ff=self.ff)
 
-    def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
+    def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants], torque):
         '''For modularity, new controllers ideally use this function to update internal
         control params (e.g., k_val, or rise_time) from the config object. If needed, add
         new ctrl params to ConfigurableConstants.'''
@@ -168,7 +168,7 @@ class GenericSplineController(Controller):
         self.exo = exo
         self.spline = None  # Placeholds so update_spline can fill self.last_spline
         spline_x = np.linspace(0,1,100)
-        spline_y = np.clip(config.torque_profile, 3, 20)
+        spline_y = np.clip(config.torque_profile, 3, 25)
         self.update_spline(spline_x, spline_y, first_call=True)
         self.fade_duration = fade_duration
         #*
@@ -182,8 +182,9 @@ class GenericSplineController(Controller):
         self.temp_phase = []
         self.temp_torque = []
 
-    """def command(self, reset=False):
+    """def command(self, config ,reset=False):
         '''Commands appropriate control. If reset=True, this controller was just switched to.'''
+        self.spline = interpolate.pchip(np.linspace(0,1,100), config.torque_profile, extrapolate=False)
         if reset:
             super().command_gains()
             self.t0 = time.perf_counter()
@@ -213,7 +214,8 @@ class GenericSplineController(Controller):
         self.exo.command_torque(desired_torque)"""
 
     def update_spline(self, spline_x, spline_y, first_call=False):
-        if first_call or self.spline_x != spline_x or self.spline_y != spline_y:
+        if first_call or (np.array(self.spline_x) != np.array(spline_x)).any() or (np.array(self.spline_y) != np.array(spline_y)).any(): #For continuous torque controller
+        #if first_call or self.spline_x != spline_x or self.spline_y != spline_y:    
             self.spline_x = spline_x
             self.spline_y = spline_y
             print('Splines updated: ', 'x = ', spline_x, 'y = ', spline_y)
@@ -221,6 +223,7 @@ class GenericSplineController(Controller):
             self.last_spline = copy.deepcopy(self.spline)
             self.spline = interpolate.pchip(
                 spline_x, spline_y, extrapolate=False)
+
     def fade_splines(self, phase, fraction):
         torque_from_last_spline = self.last_spline(phase)
         torque_from_current_spline = self.spline(phase)
@@ -240,34 +243,33 @@ class VarunContinuousTorqueController(GenericSplineController):
                  fade_duration: float = 5,
                 use_gait_phase: bool = True):
 
-        """self.exo = Exo
-        self.spline = None
-        self.config = config"""
+
         print("torque_received", torques)
-        #time.sleep(2)
         self.x_phase_value = np.linspace(0,1,100)
-        self.y_phase_value = np.clip(torques, 3, 20) #ToDo figure out this clipping issue during the prediction stage
-        #self.spline = interpolate.pchip(self.x_phase_value, self.y_phase_value, extrapolate=False)
+        self.y_phase_value = np.clip(torques, 3, 25) #ToDo figure out this clipping issue during the prediction stage
+        self.spline = None  # Placeholds so update_spline can fill self.last_spline
+        self.spline = interpolate.pchip(np.linspace(0,1,100), config.torque_profile, extrapolate=False)
+        #self.update_spline(self.x_phase_value, self.y_phase_value, first_call=True)
         self.use_gait_phase = use_gait_phase
         print("Varun Controller Running..............")
         #super().update_controller_gains(Kp=Kp, Ki=Ki, Kd=Kd, ff=ff)
         super().__init__(config=config,exo=exo,
                          spline_x= np.linspace(0,1,100),
-                         spline_y=np.clip(torques, 3, 20),
+                         spline_y= self.y_phase_value,
                          Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
                          fade_duration=fade_duration,
                          use_gait_phase=use_gait_phase)
         """def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
             self.spline = interpolate.pchip(self.x_phase_value, self.y_phase_value, extrapolate=False)   """     
-    def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
+    def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants], torque):
         'Updates controller parameters from the config object.'''
-        super().update_spline(spline_x=np.linspace(0,1,100),
-                              spline_y=np.clip(config.torque_profile, 3, 20))
+        super().update_spline(spline_x=np.linspace(0,1,100),spline_y=torque)
+        #super().update_spline(spline_x=[0,0.4,0.53,0.65,10],spline_y=[3,3,10,3,3]) #4point spline
 
     def command(self, config, reset= False):
         '''Commands appropriate control. If reset=True, this controller was just switched to.'''
         #print("commanding the desired torque")
-        self.spline = interpolate.pchip(np.linspace(0,1,100), config.torque_profile, extrapolate=False)
+        #self.spline = interpolate.pchip(np.linspace(0,1,100), config.torque_profile, extrapolate=False)
         #print(self.config.torque_profile)
         if reset:
             super().command_gains()
@@ -295,8 +297,8 @@ class VarunContinuousTorqueController(GenericSplineController):
         self.temp_phase.append(phase)
         self.temp_torque.append(desired_torque)
         #print("Phase", self.temp_phase, len(self.temp_phase))
-        print("Desired_torque")#,self.temp_torque)
-        desired_torque = np.clip(desired_torque,0,25)
+        #print("Desired_torque", phase,desired_torque)#, self.temp_torque)
+        desired_torque = np.clip(desired_torque,3,25)
         self.exo.command_torque(desired_torque)
 
 class FourPointSplineController(GenericSplineController):

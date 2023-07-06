@@ -70,8 +70,7 @@ class ConfigurableConstants():
     ONLY_LOG_IF_NEW: bool = True
 
     TASK: Type[Task] = Task.WALKING
-    """STANCE_CONTROL_STYLE: Type[
-        StanceCtrlStyle] = StanceCtrlStyle.FOURPOINTSPLINE"""
+    #STANCE_CONTROL_STYLE: Type[StanceCtrlStyle] = StanceCtrlStyle.FOURPOINTSPLINE
     STANCE_CONTROL_STYLE: Type[StanceCtrlStyle] = StanceCtrlStyle.VARUN
     MAX_ALLOWABLE_CURRENT = 20000  # mA
 
@@ -98,7 +97,7 @@ class ConfigurableConstants():
     RISE_FRACTION: float = 0.2#0.075 
     PEAK_FRACTION: float = 0.53#0.33535#
     FALL_FRACTION: float = 0.65#0.44478#
-    PEAK_TORQUE: float = 8
+    PEAK_TORQUE: float = 12
 
     """RISE_FRACTION: float = 0.376400032043457#0.2#0.075 
     PEAK_FRACTION: float = 0.59497730255127#0.53#0.33535#
@@ -108,6 +107,7 @@ class ConfigurableConstants():
 
     #Varun Controller, Continuous torque
     torque_profile = np.zeros(100)
+    action_received: float = False
 
     # Impedance
     K_VAL: int = 500

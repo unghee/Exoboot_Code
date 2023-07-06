@@ -10,12 +10,14 @@ LIKE: EnumPreference
 SKIP: EnumPreference
 
 class ControllerPing(_message.Message):
-    __slots__ = ["ankle_angle", "ankle_angular_velocity"]
+    __slots__ = ["ankle_angle", "ankle_angular_velocity", "exo_side"]
     ANKLE_ANGLE_FIELD_NUMBER: _ClassVar[int]
     ANKLE_ANGULAR_VELOCITY_FIELD_NUMBER: _ClassVar[int]
+    EXO_SIDE_FIELD_NUMBER: _ClassVar[int]
     ankle_angle: _containers.RepeatedScalarFieldContainer[float]
     ankle_angular_velocity: _containers.RepeatedScalarFieldContainer[float]
-    def __init__(self, ankle_angle: _Optional[_Iterable[float]] = ..., ankle_angular_velocity: _Optional[_Iterable[float]] = ...) -> None: ...
+    exo_side: float
+    def __init__(self, ankle_angle: _Optional[_Iterable[float]] = ..., ankle_angular_velocity: _Optional[_Iterable[float]] = ..., exo_side: _Optional[float] = ...) -> None: ...
 
 class GuiInput(_message.Message):
     __slots__ = ["enumpreference"]

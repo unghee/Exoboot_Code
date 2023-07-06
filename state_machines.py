@@ -157,10 +157,10 @@ class StanceSwingReeloutReelinStateMachine(HighLevelController):
 
         if not read_only:
             #*self.controller_now.command(reset=did_controllers_switch)
-            self.controller_now.command(config=config,reset=did_controllers_switch)
+            self.controller_now.command(config=config, reset=did_controllers_switch)
 
     def update_ctrl_params_from_config(self, config):
-        self.stance_controller.update_ctrl_params_from_config(config=config)
+        self.stance_controller.update_ctrl_params_from_config(config=config, torque=config.torque_profile)
         if self.swing_only != config.SWING_ONLY:
             self.swing_only = config.SWING_ONLY
             print('Updated swing only to: ', self.swing_only)
