@@ -10,14 +10,16 @@ LIKE: EnumPreference
 SKIP: EnumPreference
 
 class ControllerPing(_message.Message):
-    __slots__ = ["ankle_angle", "ankle_angular_velocity", "exo_side"]
-    ANKLE_ANGLE_FIELD_NUMBER: _ClassVar[int]
-    ANKLE_ANGULAR_VELOCITY_FIELD_NUMBER: _ClassVar[int]
-    EXO_SIDE_FIELD_NUMBER: _ClassVar[int]
-    ankle_angle: _containers.RepeatedScalarFieldContainer[float]
-    ankle_angular_velocity: _containers.RepeatedScalarFieldContainer[float]
-    exo_side: float
-    def __init__(self, ankle_angle: _Optional[_Iterable[float]] = ..., ankle_angular_velocity: _Optional[_Iterable[float]] = ..., exo_side: _Optional[float] = ...) -> None: ...
+    __slots__ = ["ankle_angle_LEFT", "ankle_angle_RIGHT", "ankle_angular_velocity_LEFT", "ankle_angular_velocity_RIGHT"]
+    ANKLE_ANGLE_LEFT_FIELD_NUMBER: _ClassVar[int]
+    ANKLE_ANGLE_RIGHT_FIELD_NUMBER: _ClassVar[int]
+    ANKLE_ANGULAR_VELOCITY_LEFT_FIELD_NUMBER: _ClassVar[int]
+    ANKLE_ANGULAR_VELOCITY_RIGHT_FIELD_NUMBER: _ClassVar[int]
+    ankle_angle_LEFT: _containers.RepeatedScalarFieldContainer[float]
+    ankle_angle_RIGHT: _containers.RepeatedScalarFieldContainer[float]
+    ankle_angular_velocity_LEFT: _containers.RepeatedScalarFieldContainer[float]
+    ankle_angular_velocity_RIGHT: _containers.RepeatedScalarFieldContainer[float]
+    def __init__(self, ankle_angle_LEFT: _Optional[_Iterable[float]] = ..., ankle_angular_velocity_LEFT: _Optional[_Iterable[float]] = ..., ankle_angle_RIGHT: _Optional[_Iterable[float]] = ..., ankle_angular_velocity_RIGHT: _Optional[_Iterable[float]] = ...) -> None: ...
 
 class GuiInput(_message.Message):
     __slots__ = ["enumpreference"]

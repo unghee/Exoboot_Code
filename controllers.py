@@ -297,7 +297,7 @@ class VarunContinuousTorqueController(GenericSplineController):
         self.temp_phase.append(phase)
         self.temp_torque.append(desired_torque)
         #print("Phase", self.temp_phase, len(self.temp_phase))
-        #print("Desired_torque", phase,desired_torque)#, self.temp_torque)
+        print("Desired_torque", phase,desired_torque)#, self.temp_torque)
         desired_torque = np.clip(desired_torque,3,25)
         self.exo.command_torque(desired_torque)
 

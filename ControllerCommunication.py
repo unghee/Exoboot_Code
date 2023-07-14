@@ -30,7 +30,7 @@ class ControllerCommunication(threading.Thread):
     #def storing_the_stride_values(self):
 
 
-    def sending_data(self, ankle_a, ankle_v, exo_side):
+    def sending_data(self, ankle_a_l, ankle_v_l, ankle_a_r, ankle_v_r):
         for exo in self.exo_list:
             #print(exo.data.did_heel_strike, self.temp_ankle_angle, self.temp_ankle_angular_velocity)
             """if (exo.data.did_heel_strike == True):
@@ -49,7 +49,7 @@ class ControllerCommunication(threading.Thread):
                 print("Sending.............")
                 stub = Message_pb2_grpc.ControllerAlgorithmStub(channel)
                 response = stub.ControllerMessage(
-                    Message_pb2.ControllerPing(ankle_angle = ankle_a, ankle_angular_velocity = ankle_v, exo_side=exo_side))
+                    Message_pb2.ControllerPing(ankle_angle_LEFT = ankle_a_l, ankle_angular_velocity_LEFT = ankle_v_l, ankle_angle_RIGHT = ankle_a_r, ankle_angular_velocity_RIGHT = ankle_v_r))
                 print('Response received') 
                 #Message_pb2.ControllerPing(ankle_angle = exo.data.ankle_angle, ankle_angular_velocity = exo.data.ankle_velocity))
             except grpc.RpcError as e:

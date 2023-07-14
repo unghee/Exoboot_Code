@@ -62,9 +62,10 @@ service ControllerAlgorithm{
 }
 
 message ControllerPing{
-  repeated float ankle_angle = 1;
-  repeated float ankle_angular_velocity = 2;
-  float exo_side = 3;
+  repeated float ankle_angle_LEFT = 1;
+  repeated float ankle_angular_velocity_LEFT = 2;
+  repeated float ankle_angle_RIGHT = 3;
+  repeated float ankle_angular_velocity_RIGHT = 4;
 }
 
 /* This service is between
