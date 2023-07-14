@@ -36,6 +36,9 @@ class GaitStateEstimator():
         if self.do_print_heel_strikes and data.did_heel_strike:
             print('heel strike detected on side: %-*s  at time: %s' %
                   (10, self.side, data.loop_time))
+            return True #*
+        else:#*
+            return False#*
             #print("Enter detect did_heel_strike")
     def update_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
         pass

@@ -13,11 +13,11 @@ import util
 class HighLevelController():
     '''A class that steps through controllers depending on, for instance, gait events.'''
 
-    def __init__(self,
+    def __init__(self,config,
                  exo: Type[Exo]):
         self.exo = exo
 
-    def step(self, read_only):
+    def step(self, config, read_only):
         '''Primary function to step through mid-level controllers.'''
         raise ValueError('step() not written yet for this controller')
 
@@ -82,6 +82,7 @@ class StanceSwingStateMachine(HighLevelController):
         self.controller_now = self.swing_controller
 
     def step(self, read_only=False):
+        print("Here.....................")
         # Check state machine transition criteria, switching controller_now if criteria are met
         if (self.controller_now == self.swing_controller and
             self.exo.data.did_heel_strike and
@@ -93,7 +94,6 @@ class StanceSwingStateMachine(HighLevelController):
             did_controllers_switch = True
         else:
             did_controllers_switch = False
-
         if not read_only:
             self.controller_now.command(reset=did_controllers_switch)
 
@@ -104,7 +104,7 @@ class StanceSwingStateMachine(HighLevelController):
 class StanceSwingReeloutReelinStateMachine(HighLevelController):
     '''Unilateral state machine that takes in data, segments strides, and applies controllers'''
 
-    def __init__(self,
+    def __init__(self,config,
                  exo: Exo,
                  stance_controller: Type[controllers.Controller],
                  swing_controller: Type[controllers.Controller],
@@ -115,6 +115,7 @@ class StanceSwingReeloutReelinStateMachine(HighLevelController):
         '''A state machine object is associated with an exo, and reads/stores exo data, applies logic to
         determine gait states and phases, chooses the correct controllers, and applies the
         controller.'''
+        self.config = config
         self.exo = exo
         self.stance_controller = stance_controller
         self.swing_controller = swing_controller
@@ -124,7 +125,7 @@ class StanceSwingReeloutReelinStateMachine(HighLevelController):
         self.just_starting = True
         self.swing_only = swing_only
 
-    def step(self, read_only=False):
+    def step(self, config,read_only=False):
         # Check state machine transition criteria, switching controller_now if criteria are met
         if self.just_starting:
             self.controller_now = self.reel_out_controller
@@ -151,15 +152,15 @@ class StanceSwingReeloutReelinStateMachine(HighLevelController):
             self.controller_now = self.swing_controller
             did_controllers_switch = True
             self.exo.data.gen_var1 = 3
-
         else:
             did_controllers_switch = False
 
         if not read_only:
-            self.controller_now.command(reset=did_controllers_switch)
+            #*self.controller_now.command(reset=did_controllers_switch)
+            self.controller_now.command(config=config, reset=did_controllers_switch)
 
     def update_ctrl_params_from_config(self, config):
-        self.stance_controller.update_ctrl_params_from_config(config=config)
+        self.stance_controller.update_ctrl_params_from_config(config=config, torque=config.torque_profile)
         if self.swing_only != config.SWING_ONLY:
             self.swing_only = config.SWING_ONLY
             print('Updated swing only to: ', self.swing_only)

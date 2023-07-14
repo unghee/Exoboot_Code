@@ -2,13 +2,17 @@
 import config_util
 config = config_util.ConfigurableConstants()
 # config.HS_GYRO_DELAY = 0.05  # For example
-config.MAX_ALLOWABLE_CURRENT = 24000  # mA
+config.MAX_ALLOWABLE_CURRENT = 11000#25000  # mA originally 25000
 config.REEL_IN_MV = 900
 config.REEL_IN_TIMEOUT = 0.075 # 0.2
 config.SWING_SLACK = 3500 #5000
+config.SWING_ONLY = False #*
 config.TOE_OFF_FRACTION = 0.65
 config.DO_INCLUDE_GEN_VARS = True
+config.HS_GYRO_THRESHOLD = 10
+config.READ_ONLY = False
 
+#*
 ''' Here are the variables that are updatable in config, and their defaults:
 
     TARGET_FREQ: float = 200  # Hz

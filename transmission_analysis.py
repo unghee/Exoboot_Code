@@ -14,7 +14,7 @@ RIGHT_ANKLE_TO_MOTOR = np.array(
      7.05016223e+02, -1.09811413e+04])
 
 folder = 'exo_data/'
-for filename in ["20211117_2240_calibration2_LEFT.csv"]:
+for filename in ["20230614_1909_calibration2_LEFT.csv"]:
     # filename = "20210616_1945_calibration2_RIGHT.csv"
     with open(folder + filename) as f:
         motor_angle = [int(row["motor_angle"])

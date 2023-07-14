@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+message Null {};
+
+/* This service is between
+GUI: Running on the Surface Tablet {Client}
+and
+Algorithm: Running on the computer {Server}
+DESCRIPTION:
+The GUI will send the user input {i.e int32 LIKE(1), DISLIKE(-1) or SKIP(0)} and will receive a
+NULL message indicating new control parameters are generated -> new torque values
+are given to the motor by the RL Algorithm
+*/
+service GuiAlgorithm{
+  rpc UserInput (GuiInput) returns (Null) {}
+
+}
+enum EnumPreference{
+  SKIP = 0;
+  LIKE = 1;
+  DISLIKE = -1;
+}
+
+message GuiInput {
+  EnumPreference enumpreference = 1;
+}
+
+/* This service is between
+Algorithm: Running on the computer {Client}
+and
+GUI: Running on the Surface Tablet {Server}
+DESCRIPTION:
+The Algorithm will send commands to the GUI after "X" number of strides (X is a hyperparameter which has to be tuned)
+to ask user's fro preference. 
+THe reason for this is because we want to do continous updates based on numeric rewards like every "Y" strides and only ask for
+user preference after certain number of steps. Getting user preference is costly, so we want to continuauly learn based on numeric reward functions and 
+use user preference for torque profile tuning on a high level
+*/
+
+service AskingforPreference{
+  rpc PreferenceUpdateStep (PreferenceFlag) returns (Null) {}
+}
+
+message PreferenceFlag{
+  bool PFlag = 1;
+}
+
+/*
+message PreferenceValue{
+  EnumPreference enumpreference = 1;
+}
+*/
+/* This service is between
+Lowlevel controlller: Running on the Rpi {Client}
+and
+Algorithm: Running on the computer {Server}
+DESCRIPTION:
+
+*/
+service ControllerAlgorithm{
+  rpc ControllerMessage (ControllerPing) returns (Null) {}
+}
+
+message ControllerPing{
+  repeated float ankle_angle_LEFT = 1;
+  repeated float ankle_angular_velocity_LEFT = 2;
+  repeated float ankle_angle_RIGHT = 3;
+  repeated float ankle_angular_velocity_RIGHT = 4;
+}
+
+/* This service is between
+Algorithm: Running on the computer {Client}
+Lowlevel controlller: Running on the Rpi {Server}
+DESCRIPTION:
+
+*/
+service ActionState{
+  rpc ActionMessage (SendingAction) returns (Null) {}
+}
+
+message SendingAction{
+  repeated float action_torque_profile = 1;
+}

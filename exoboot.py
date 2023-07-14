@@ -185,6 +185,8 @@ class Exo():
         commanded_torque: float = None
         slack: int = None
         temperature: int = None
+        is_clipping: bool = False
+        max_allowable_torque: float = 0
 
         #Control Parameters
         rise: float = 0.2
@@ -318,7 +320,7 @@ class Exo():
         self.data.gyro_y = -1 * self.motor_sign * \
             actpack_data.gyroy * constants.GYRO_GAIN
         #Remove -1 for EB-51
-        self.data.gyro_z = self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN  # sign may be different from Max's device
+        self.data.gyro_z = self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN#-1 * self.motor_sign * actpack_data.gyroz * constants.GYRO_GAIN  # sign may be different from Max's device
         '''Motor angle and current are kept in Dephy's orientation, but ankle
         angle and torque are converted to positive = plantarflexion.'''
         self.data.motor_angle = actpack_data.mot_ang
@@ -465,13 +467,16 @@ class Exo():
             print('desired_torque: ', desired_torque)
             raise ValueError('Cannot apply negative torques')
         max_allowable_torque = self.calculate_max_allowable_torque()
+        self.data.max_allowable_torque = max_allowable_torque
         if desired_torque > max_allowable_torque:
             if self.is_clipping is False:  # Only print once when clipping occurs before reset
                 logging.warning('Torque was clipped!')
             desired_torque = max_allowable_torque
             self.is_clipping = True
+            self.data.is_clipping = self.is_clipping
         else:
             self.is_clipping = False
+            self.data.is_clipping = self.is_clipping
 
         # Softly reduce desired torque at high ankle angles when TR approaches 0
         if do_ease_torque_off:
